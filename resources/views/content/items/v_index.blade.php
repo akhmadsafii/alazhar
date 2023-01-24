@@ -69,9 +69,10 @@
                                     <th>#</th>
                                     <th>Nama Barang</th>
                                     <th>Kode</th>
+                                    <th>Kategori Barang</th>
+                                    <th>Sumber Dana</th>
                                     <th>Kondisi</th>
                                     <th>Lokasi</th>
-                                    <th></th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -95,26 +96,22 @@
                         </div>
                         <div class="modal-body">
                             <input type="hidden" name="id" id="id_item">
+                            <div class="form-group display-add">
+                                <label>Pilih Barang</label>
+                                <select name="id_stuff" id="id_stuff" class="form-control m-bootstrap-select m_selectpicker"
+                                    data-live-search="true">
+                                    <option value="" selected disabled>-- Pilih Barang --</option>
+                                    @foreach ($stuff as $st)
+                                        <option value="{{ $st['id'] }}">{{ $st['name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group display-add">
+                                <label>Jumlah</label>
+                                <input type="text" name="amount" id="amount" class="form-control">
+                            </div>
+
                             <div class="row">
-                                <div class="col-md-6 display-stuff">
-                                    <div class="form-group">
-                                        <label>Pilih Barang</label>
-                                        <select name="id_stuff" id="id_stuff"
-                                            class="form-control m-bootstrap-select m_selectpicker" data-live-search="true">
-                                            <option value="" selected disabled>-- Pilih Barang --</option>
-                                            @foreach ($stuff as $st)
-                                                <option value="{{ $st['id'] }}">{{ $st['name'] }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Kode Item</label>
-                                        <input type="text" class="form-control m-input" id="name" name="name"
-                                            placeholder="Kategori Barang">
-                                    </div>
-                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Lokasi</label>
@@ -139,14 +136,20 @@
                                 </div>
                                 <div class="col-md-6 display-stuff">
                                     <div class="form-group">
-                                        <label>Jumlah</label>
-                                        <input type="text" name="amount" id="amount" class="form-control">
+                                        <label>Pilih Sumber Dana</label>
+                                        <select name="id_source" id="id_source" class="form-control"
+                                            data-live-search="true">
+                                            <option value="" selected disabled>-- Pilih Sumber Dana --</option>
+                                            @foreach ($sources as $source)
+                                                <option value="{{ $source['id'] }}">{{ $source['code'] }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Tanggal Diterima</label>
-                                        <input type="date" name="received_date" id="received_date" class="form-control">
+                                        <input type="date" name="date_received" id="date_received" class="form-control">
                                     </div>
                                 </div>
                             </div>
@@ -262,8 +265,16 @@
                             name: 'stuffs.name',
                         },
                         {
-                            data: 'name',
-                            name: 'name',
+                            data: 'code',
+                            name: 'code',
+                        },
+                        {
+                            data: 'stuffs.categories.name',
+                            name: 'stuffs.categories.name',
+                        },
+                        {
+                            data: 'sources.name',
+                            name: 'sources.name',
                         },
                         {
                             data: 'condition',
@@ -320,7 +331,7 @@
 
             function addData() {
                 $('#id_type').val("");
-                $('.display-stuff').removeClass("d-none");
+                $('.display-add').removeClass("d-none");
                 $('#formSubmit').trigger("reset");
                 $('#modal-title').html("Tambah {{ session('title') }}");
                 $('#modalForm').modal('show');
@@ -339,14 +350,15 @@
                     },
                     success: function(data) {
                         $('#modal-title').html("Edit {{ session('title') }}");
-                        $('.display-stuff').addClass("d-none");
+                        $('.display-add').addClass("d-none");
                         $('#id_item').val(data.id);
+                        $('#id_stuff').val(data.id_stuff);
                         $('#id_location').val(data.id_location);
                         $('#id_location').selectpicker('refresh')
                         $('#id_location').trigger('change');
-                        $('#name').val(data.name);
+                        $('#id_source').val(data.id_source);
                         $('#condition').val(data.condition).trigger('change');
-                        $('#received_date').val(data.updated_date);
+                        $('#date_received').val(data.date_received);
                         $('#modalForm').modal('show');
                     }
                 });

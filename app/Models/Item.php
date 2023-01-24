@@ -32,4 +32,9 @@ class Item extends Model
     {
         return $this->hasMany(Rental::class, 'id_item', 'id');
     }
+
+    public function sources()
+    {
+        return $this->belongsTo(Source::class, 'id_source', 'id');
+    }
 }

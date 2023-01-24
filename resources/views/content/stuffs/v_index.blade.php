@@ -511,7 +511,11 @@
                     success: function(data) {
                         $('#modal-title-detail').html("Penggunaan " + data.name);
                         $('#output_unit').html(data.units.name);
-                        $('#output_price').html(rubahRibuan(data.price));
+                        if(data.price){
+                            $('#output_price').html(rubahRibuan(data.price));
+                        }else{
+                            $('#output_price').html('-');
+                        }
                         $('#output_category').html(data.categories.name);
                         $('#output_type').html(data.types.name);
                         $('#modalDetail').modal('show');

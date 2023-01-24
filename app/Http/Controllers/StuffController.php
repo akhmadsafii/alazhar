@@ -102,6 +102,10 @@ class StuffController extends Controller
                 $start = $getnumber + 1;
                 $data['code'] = $code . '.' . $start;
             }
+        } else {
+            if ($request->price) {
+                Item::where('id_stuff', $request->id)->update(['price' => str_replace('.', '', $request->price)]);
+            }
         }
         if ($request->bhp) {
             $status_bhp = 1;
@@ -173,12 +177,9 @@ class StuffController extends Controller
     {
         session()->put('title', 'Detail Item');
         $locations = Location::where('status', '!=', 0)->get();
+        $sources = Source::where('status', '!=', 0)->get();
         $stuff = Stuff::where('code', $_GET['name'])->with('types', 'categories', 'units', 'activeItems', 'activeItems.locations')->first();
         // dd($stuff);
-        $procurements = Procurement::where([
-            ['id_stuff', $stuff->id],
-            ['status', '!=', 0]
-        ])->get();
         if ($request->ajax()) {
             return DataTables::of($stuff->activeItems)->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -201,7 +202,7 @@ class StuffController extends Controller
                 ->rawColumns(['action', 'location'])
                 ->make(true);
         }
-        return view('content.stuffs.v_information', compact('stuff', 'locations', 'procurements'));
+        return view('content.stuffs.v_information', compact('stuff', 'locations', 'sources'));
     }
 
     public function template()

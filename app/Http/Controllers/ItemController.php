@@ -9,6 +9,7 @@ use App\Models\Item;
 use App\Models\Location;
 use App\Models\Procurement;
 use App\Models\Rental;
+use App\Models\Source;
 use App\Models\Stuff;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -22,9 +23,10 @@ class ItemController extends Controller
     {
         session()->put('title', 'Item');
         $stuff = Stuff::where('status', '!=', 0)->get();
+        $sources = Source::where('status', '!=', 0)->get();
         $location = Location::where('status', '!=', 0)->get();
         if ($request->ajax()) {
-            $item = Item::select(['items.*'])->where('items.status', '!=', 0)->with('stuffs', 'locations', 'stuffs.types')->get();
+            $item = Item::select(['items.*'])->where('items.status', '!=', 0)->with('stuffs', 'locations', 'stuffs.types', 'stuffs.categories', 'sources')->get();
             return Datatables::of($item)->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     return '<span class="dropdown">
@@ -59,7 +61,7 @@ class ItemController extends Controller
             'template' => route('item.template'),
             'upload' => route('item.import')
         );
-        return view('content.items.v_index', compact('stuff', 'location', 'import'));
+        return view('content.items.v_index', compact('stuff', 'location', 'import', 'sources'));
     }
 
     public function store(Request $request)
@@ -67,113 +69,64 @@ class ItemController extends Controller
         // dd($request);
         if ($request->id) {
             $data = array(
-                'name' => $request->name,
+                'id_stuff' => $request->id_stuff,
                 'id_location' => $request->id_location,
                 'condition' => $request->condition,
+                'date_received' => $request->date_received,
+                'id_source' => $request->id_source,
             );
-            if ($request->received_date) {
-                $data['updated_date'] = $request->received_date;
-            }
             Item::where('id', $request->id)->update($data);
             return response()->json([
                 'message' => 'Item berhasil disimpan',
                 'status' => true,
             ], 200);
         } else {
-            $item = Item::where('name', 'like', "%$request->name%")->orderBy('id', 'asc')->get()->last();
-            // $item = Item::where('name', 'like', "%$request->name%")->orderBy('name', 'asc')->get()->last();
+
+            $stuff = Stuff::find($request->id_stuff);
+            $source = Source::find($request->id_source);
+            $code = $stuff['code'] . '-' . $source['code'];
+            $item = Item::where('code', 'like', "$code%")->orderBy('id', 'asc')->get()->last();
             // dd($item);
             if ($item == null) {
-                $data = [];
-                if ($request->amount) {
-                    for ($i = 1; $i <= $request->amount; $i++) {
-                        $data[] = [
-                            'id_stuff' => $request->id_stuff,
-                            'name' => $request->name . '-' . $i,
-                            'id_location' => $request->id_location,
-                            'condition' => $request->condition,
-                            'updated_date' => $request->received_date,
-                            'created_at' => now()
-                        ];
-                    }
-                    Item::insert($data);
-                    $stuff = Stuff::find($request->id_stuff);
-                    $return_amount = $stuff->amount + $request->amount;
-                    $stuff->update(['amount' => $return_amount]);
-                    return response()->json([
-                        'message' => 'Item berhasil disimpan',
-                        'status' => true,
-                    ], 200);
-                } else {
-                    return response()->json([
-                        'message' => 'Jumlah item wajib diisi',
-                        'status' => false,
-                    ], 401);
-                }
-            } else {
-                $code = explode('-', $item->name);
-                $getnumber = end($code);
-                $start = $getnumber + 1;
-                $finish = $getnumber + $request->amount;
-                $data = [];
-                for ($i = $start; $i <= $finish; $i++) {
-                    $data[] = [
+
+                $data_item = [];
+                for ($i = 1; $i <= $request->amount; $i++) {
+                    $data_item[] = [
                         'id_stuff' => $request->id_stuff,
-                        'name' => $request->name . '-' . $i,
+                        'code' => $code . '.' . $i,
+                        'condition' => 'good',
+                        'id_source' => $request->id_source,
+                        'date_received' => $request->date_received,
                         'id_location' => $request->id_location,
-                        'condition' => $request->condition,
-                        'updated_date' => $request->received_date,
-                        'created_at' => now(),
+                        'price' => $stuff->price ? str_replace('.', '', $stuff->price) : null,
+                        'created_at' => now()
                     ];
                 }
-                // dd($data);
-                Item::insert($data);
-                return response()->json([
-                    'message' => 'Item berhasil disimpan',
-                    'status' => true,
-                ], 200);
+                Item::insert($data_item);
+            } else {
+                $code_base = explode('.', $item->code);
+                $getnumber = end($code_base);
+                $start = $getnumber + 1;
+                $finish = $getnumber + $request->amount;
+                $data_item = [];
+                for ($i = $start; $i <= $finish; $i++) {
+                    $data_item[] = [
+                        'id_stuff' => $request->id_stuff,
+                        'code' => $code . '.' . $i,
+                        'condition' => 'good',
+                        'id_source' => $request->id_source,
+                        'id_location' => $request->id_location,
+                        'price' => $stuff->price ? str_replace('.', '', $stuff->price) : null,
+                        'created_at' => now()
+                    ];
+                }
+                Item::insert($data_item);
             }
+            return response()->json([
+                'message' => 'Item berhasil disimpan',
+                'status' => true,
+            ], 200);
         }
-        // }else{
-
-        // }
-
-        // if ($request->id) {
-        //     Item::where('id', $request->id)->update([
-        //             'name' => $request->name,
-        //             'id_location' => $request->id_location,
-        //             'condition' => $request->condition,
-        //             'updated_date' => $request->received_date,
-        //         ]);
-        //         return response()->json([
-        //             'message' => 'Item berhasil disimpan',
-        //             'status' => true,
-        //         ], 200);
-        // } else {
-        //     $data = [];
-        //     if ($request->amount) {
-        //         for ($i = 1; $i <= $request->amount; $i++) {
-        //             $data[] = [
-        //                 'id_stuff' => $request->id_stuff,
-        //                 'name' => $request->name . '-' . $i,
-        //                 'id_location' => $request->id_location,
-        //                 'condition' => $request->condition,
-        //                 'updated_date' => $request->received_date,
-        //             ];
-        //         }
-        //         Item::insert($data);
-        //         return response()->json([
-        //             'message' => 'Item berhasil disimpan',
-        //             'status' => true,
-        //         ], 200);
-        //     } else {
-        //         return response()->json([
-        //             'message' => 'Jumlah item wajib diisi',
-        //             'status' => false,
-        //         ], 401);
-        //     }
-        // }
-
     }
 
     public function detail(Request $request)

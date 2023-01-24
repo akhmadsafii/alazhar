@@ -70,7 +70,9 @@ class BarcodeController extends Controller
     {
         // dd('print barcode');
         $stuff = Stuff::where('id', decrypt($_GET['k']))->with(['categories', 'types', 'items', 'items.locations'])->first();
-        $pdf = PDF::loadView('content.barcodes.v_print_page',compact("stuff"));
+        // dd($stuff);
+        // return view('content.barcodes.v_print_page', compact("stuff"));
+        $pdf = PDF::loadView('content.barcodes.v_print_page', compact("stuff"));
         return $pdf->stream('barcode_sarana.pdf');
     }
 }
