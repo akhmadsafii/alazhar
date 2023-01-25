@@ -126,6 +126,7 @@ class StuffController extends Controller
                 for ($i = 1; $i <= $request->amount; $i++) {
                     $data_item[] = [
                         'id_stuff' => $stuff->id,
+                        'id_source' => $request->id_source,
                         'code' => $code . '.' . $i,
                         'condition' => 'good',
                         'price' => $request->price ? str_replace('.', '', $request->price) : null,
@@ -143,6 +144,7 @@ class StuffController extends Controller
                     $data_item[] = [
                         'id_stuff' => $stuff->id,
                         'code' => $code . '.' . $i,
+                        'id_source' => $request->id_source,
                         'condition' => 'good',
                         'price' => $request->price ? str_replace('.', '', $request->price) : null,
                         'created_at' => now()

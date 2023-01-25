@@ -66,7 +66,7 @@
                                             <span
                                                 class="m-widget12__text1">Kondisi<br><span>{{ $item['condition'] == 'broken' ? 'Rusak' : 'Bagus' }}</span></span>
                                             <span
-                                                class="m-widget12__text2">Lokasi<br><span>{{ $item->locations->name }}</span></span>
+                                                class="m-widget12__text2">Lokasi<br><span>{{ $item->locations ? $item->locations->name : '-' }}</span></span>
                                         </div>
                                     </div>
                                 </div>
