@@ -72,6 +72,16 @@
                                     id="phone" value="{{ $_GET['action'] == 'edit' ? $user['phone'] : '' }}">
                             </div>
                             <div class="form-group m-form__group">
+                                <label>Posisi</label>
+                                <select name="position" id="position" class="form-control m-input m-input--square">
+                                    <option value="" selected disabled>-- Pilih Posisi --</option>
+                                    <option value="student" {{ $_GET['action'] == 'edit' && $user['position'] == 'student' ? 'selected' : '' }}>Siswa</option>
+                                    <option value="teacher" {{ $_GET['action'] == 'edit' && $user['position'] == 'teacher' ? 'selected' : '' }}>Guru</option>
+                                    <option value="staff" {{ $_GET['action'] == 'edit' && $user['position'] == 'staff' ? 'selected' : '' }}>Staff</option>
+                                    <option value="other" {{ $_GET['action'] == 'edit' && $user['position'] == 'other' ? 'selected' : '' }}>Lainnya</option>
+                                </select>
+                            </div>
+                            <div class="form-group m-form__group">
                                 <label>Jenis Kelamin</label>
                                 <div class="m-radio-inline">
                                     <label class="m-radio">

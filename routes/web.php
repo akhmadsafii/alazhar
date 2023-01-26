@@ -179,6 +179,7 @@ Route::middleware('auth:admin')->group(function () {
         Route::get('delete', [ItemController::class, 'delete'])->name('delete');
         Route::get('location-item', [ItemController::class, 'location_item'])->name('location_item');
         Route::get('location-stuff', [ItemController::class, 'location_stuff'])->name('datatable_location_stuff');
+        Route::get('print-qr', [ItemController::class, 'print_qr'])->name('print_qr');
         Route::get('template', [ItemController::class, 'template'])->name('template');
         Route::post('import', [ItemController::class, 'import'])->name('import');
     });
@@ -243,6 +244,7 @@ Route::middleware('auth:admin')->group(function () {
 
     Route::prefix('barcodes')->name('barcode.')->group(function () {
         Route::get('/', [BarcodeController::class, 'index'])->name('home');
+        Route::post('/', [BarcodeController::class, 'store'])->name('store');
         Route::get('print', [BarcodeController::class, 'print'])->name('print');
     });
 

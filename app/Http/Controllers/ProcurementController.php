@@ -42,42 +42,18 @@ class ProcurementController extends Controller
         if ($request->ajax()) {
             return DataTables::of($procurement)->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<div class="m-dropdown m-dropdown--inline m-dropdown--arrow m-dropdown--align-left m-dropdown--align-push" m-dropdown-toggle="click" aria-expanded="true">
-                    <a href="javascript:void(0)" class="m-portlet__nav-link m-dropdown__toggle btn m-btn m-btn--link">
+                    $btn = '<span class="dropdown">
+                    <a href="#" class="btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" data-toggle="dropdown" aria-expanded="true">
                         <i class="la la-ellipsis-v"></i>
                     </a>
-                    <div class="m-dropdown__wrapper" style="width: 120px">
-                        <span class="m-dropdown__arrow m-dropdown__arrow--left m-dropdown__arrow--adjust"></span>
-                        <div class="m-dropdown__inner" style="width: 120px">
-                            <div class="m-dropdown__body">
-                                <div class="m-dropdown__content">
-                                    <ul class="m-nav">
-                                        <li class="m-nav__item">
-                                            <a href="javascript:void(0)" onclick="detailData(' . $row['id'] . ')" class="m-nav__link">
-                                                <i class="m-nav__link-icon flaticon-info"></i>
-                                                <span class="m-nav__link-text">Detail</span>
-                                            </a>
-                                        </li>';
+                    <div class="dropdown-menu dropdown-menu-right">
+                    <a class="dropdown-item" href="javascript:void(0)" onclick="detailData(' . $row['id'] . ')"><i class="la la-info-circle"></i> Detail</a>';
                     if ($row['status'] == 2) {
-                        $btn .= '<li class="m-nav__item">
-                            <a href="javascript:void(0)" onclick="editData(' . $row['id'] . ')" class="m-nav__link">
-                                <i class="m-nav__link-icon flaticon-edit"></i>
-                                <span class="m-nav__link-text">Edit</span>
-                            </a>
-                        </li>
-                        <li class="m-nav__item">
-                            <a href="javascript:void(0)" onclick="deleteData(' . $row['id'] . ')" class="m-nav__link">
-                                <i class="m-nav__link-icon flaticon-delete"></i>
-                                <span class="m-nav__link-text">Hapus</span>
-                            </a>
-                        </li>';
+                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="editData(' . $row['id'] . ')"><i class="la la-edit"></i> Edit</a>';
                     }
-                    $btn .= '</ul>
-                                </div>
-                            </div>
+                    $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="deleteData(' . $row['id'] . ')"><i class="la la-trash"></i> Hapus</a>
                         </div>
-                    </div>
-                </div>';
+                    </span>';
                     return $btn;
                 })
                 ->editColumn('date_of_filing', function ($pro) {
@@ -119,10 +95,10 @@ class ProcurementController extends Controller
     }
     public function store(Request $request)
     {
+        // dd($request);
         $data = $request->toArray();
         $unit_price = str_replace('.', '', $request->unit_price);
         $data['total_price'] = $request->amount * $unit_price;
-        $data['date_of_filing'] = now();
         $data['status'] = 2;
         $data['unit_price'] = $unit_price;
         $result = Procurement::updateOrCreate(

@@ -28,28 +28,14 @@ class BarcodeController extends Controller
                     $item = $item->where('status', '!=', 0);
                     $items = count($item);
                     if ($items > 0) {
-                        $btn = '<div class="m-dropdown m-dropdown--inline m-dropdown--arrow m-dropdown--align-left m-dropdown--align-push" m-dropdown-toggle="click" aria-expanded="true">
-                            <a href="javascript:void(0)" class="m-portlet__nav-link m-dropdown__toggle btn m-btn m-btn--link">
-                                <i class="la la-ellipsis-v"></i>
-                            </a>
-                            <div class="m-dropdown__wrapper" style="width: 120px">
-                                <span class="m-dropdown__arrow m-dropdown__arrow--left m-dropdown__arrow--adjust"></span>
-                                <div class="m-dropdown__inner" style="width: 120px">
-                                    <div class="m-dropdown__body">
-                                        <div class="m-dropdown__content">
-                                            <ul class="m-nav">
-                                                <li class="m-nav__item">
-                                                    <a href="' . route('barcode.print', ['k' => encrypt($stuff['id'])]) . '" target="_blank" class="m-nav__link">
-                                                        <i class="m-nav__link-icon flaticon-file-2"></i>
-                                                        <span class="m-nav__link-text">Cetak</span>
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>';
+                        $btn = '<span class="dropdown">
+                    <a href="#" class="btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" data-toggle="dropdown" aria-expanded="true">
+                        <i class="la la-ellipsis-v"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="printData(' . $stuff['id'] . ')"><i class="la la-qrcode"></i> Cetak QR</a>
+                    </div>
+                </span>';
                     } else {
                         $btn = '<small class="text-danger">Item Kosong</small>';
                     }
@@ -64,6 +50,19 @@ class BarcodeController extends Controller
                 ->make(true);
         }
         return view('content.barcodes.v_index', compact('category', 'type', 'unit', 'supplier'));
+    }
+
+    public function store(Request $request)
+    {
+        // dd($request);
+        $stuff = Stuff::where('id', $request->id)->with(['items'])->first();
+        $layout = [
+            'horizontal' => $request->amount_horizontal,
+            'total' => $request->total_per_page
+        ];
+        // return view('content.barcodes.v_print_page', compact("stuff"));
+        $pdf = PDF::loadView('content.barcodes.v_print_page', compact("stuff", "layout"));
+        return $pdf->stream('barcode_sarana.pdf');
     }
 
     public function print()

@@ -16,7 +16,7 @@ class SupplierController extends Controller
 {
     public function index(Request $request)
     {
-        session()->put('title', 'Suplier');
+        session()->put('title', 'Penyedia');
         $supplier = Supplier::where('status', '!=', 0);
         if ($request->ajax()) {
             return DataTables::of($supplier)->addIndexColumn()
@@ -49,18 +49,17 @@ class SupplierController extends Controller
                         </div>
                     </div>
                 </div>';
-                return $btn;
+                    return $btn;
                 })
                 ->editColumn('file', function ($supplier) {
-                    if($supplier['file'] != null){
+                    if ($supplier['file'] != null) {
                         return '
                         <div class="m-widget4__img m-widget4__img--logo">
-                            <img src="'.UploadHelper::show_image($supplier['file']).'" alt="" height="80">
+                            <img src="' . UploadHelper::show_image($supplier['file']) . '" alt="" height="80">
                         </div>';
-                    }else{
+                    } else {
                         return '-';
                     }
-
                 })
                 ->rawColumns(['action', 'file'])
                 ->make(true);
@@ -115,15 +114,14 @@ class SupplierController extends Controller
                 'status' => true,
             ], 200);
         }
-
     }
 
     public function detail(Request $request)
     {
         $supplier = Supplier::find($request['id']);
-        if($supplier->file != null){
+        if ($supplier->file != null) {
             $supplier['show_image'] = UploadHelper::show_image($supplier->file);
-        }else{
+        } else {
             $supplier['show_image'] = null;
         }
         return response()->json($supplier);

@@ -19,9 +19,6 @@ class RentalController extends Controller
     public function index(Request $request)
     {
         session()->put('title', 'Peminjaman Barang');
-        // if ($_GET['status'] == 'all-procurement') {
-        // } else {
-        // }
         $user = User::where('status', '!=', 0)->get();
         $stuff = Stuff::where([
             ['status_bhp', 0],
@@ -33,14 +30,22 @@ class RentalController extends Controller
             ->join('items as it', 'it.id', '=', 'rentals.id_item')
             ->join('users as us', 'us.id', '=', 'rentals.id_user')
             ->join('types as tp', 'tp.id', '=', 'st.id_type')
-            ->select('rentals.*', 'st.name as name_stuff', 'it.name as name_item', 'us.name as name_user', 'tp.group as group');
+            ->select('rentals.*', 'st.name as name_stuff', 'it.code as name_item', 'us.name as name_user', 'tp.group as group');
         if ($_GET['status'] == 'submission')
             $rental->where('rentals.status', '=', 2);
 
         if ($_GET['status'] == 'approved')
-            $rental->where('rentals.status', '=', 1);
+            $rental->where([
+                ['rentals.status', '=', 1],
+                ['rentals.returned_date', NULL]
+            ]);
         if ($_GET['status'] == 'rejected')
             $rental->where('rentals.status', '=', 3);
+        if ($_GET['status'] == 'finished')
+            $rental->where([
+                ['rentals.status', '=', 1],
+                ['rentals.returned_date', '!=', NULL]
+            ]);
         if ($_GET['status'] == 'all-procurement')
             $rental->where('rentals.status', '!=', 0);
 
@@ -48,48 +53,19 @@ class RentalController extends Controller
         if ($request->ajax()) {
             return DataTables::of($rental)->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<div class="m-dropdown m-dropdown--inline m-dropdown--arrow m-dropdown--align-left m-dropdown--align-push" m-dropdown-toggle="click" aria-expanded="true">
-                    <a href="javascript:void(0)" class="m-portlet__nav-link m-dropdown__toggle btn m-btn m-btn--link">
+                    $btn = '<span class="dropdown">
+                    <a href="#" class="btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" data-toggle="dropdown" aria-expanded="true">
                         <i class="la la-ellipsis-v"></i>
                     </a>
-                    <div class="m-dropdown__wrapper">
-                        <span class="m-dropdown__arrow m-dropdown__arrow--left m-dropdown__arrow--adjust"></span>
-                        <div class="m-dropdown__inner" >
-                            <div class="m-dropdown__body">
-                                <div class="m-dropdown__content">
-                                    <ul class="m-nav">';
+                    <div class="dropdown-menu dropdown-menu-right">';
                     if ($row['returned_date'] == null && $row['status'] == 1) {
-                        $btn .= '<li class="m-nav__item">
-                                        <a href="javascript:void(0)" onclick="confirmBack(' . $row['id'] . ')" class="m-nav__link">
-                                            <i class="m-nav__link-icon flaticon-safe-shield-protection"></i>
-                                            <span class="m-nav__link-text">Konfirmasi Barang telah kembali</span>
-                                        </a>
-                                    </li>';
+                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="confirmBack(' . $row['id'] . ')"><i class="la la-check-circle"></i> Konfirmasi Kembali</a>';
                     }
-                    $btn .= '<li class="m-nav__item">
-                                            <a href="javascript:void(0)" onclick="detailData(' . $row['id'] . ')" class="m-nav__link">
-                                                <i class="m-nav__link-icon flaticon-info"></i>
-                                                <span class="m-nav__link-text">Detail</span>
-                                            </a>
-                                        </li>
-                                        <li class="m-nav__item">
-                                            <a href="javascript:void(0)" onclick="editData(' . $row['id'] . ')" class="m-nav__link">
-                                                <i class="m-nav__link-icon flaticon-edit"></i>
-                                                <span class="m-nav__link-text">Edit</span>
-                                            </a>
-                                        </li>
-                                        <li class="m-nav__item">
-                                            <a href="javascript:void(0)" onclick="deleteData(' . $row['id'] . ')" class="m-nav__link">
-                                                <i class="m-nav__link-icon flaticon-delete"></i>
-                                                <span class="m-nav__link-text">Hapus</span>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                    $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="detailData(' . $row['id'] . ')"><i class="la la-info-circle"></i> Detail</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="editData(' . $row['id'] . ')"><i class="la la-edit"></i> Edit</a>
+                            <a class="dropdown-item" href="javascript:void(0)" onclick="deleteData(' . $row['id'] . ')"><i class="la la-trash"></i> Hapus</a>
                         </div>
-                    </div>
-                </div>';
+                    </span>';
                     return $btn;
                 })
                 ->editColumn('rental_date', function ($row) {
@@ -118,10 +94,11 @@ class RentalController extends Controller
 
         if ($request['item']) {
             $data = [];
+            // dd($request->item);
             foreach ($request->item as $key => $value) {
                 $data[] = [
                     'id_stuff' => $request->id_stuff,
-                    'id_item' => $key,
+                    'id_item' => $value,
                     'id_user' => $request->id_user,
                     'rental_date' => $request->rental_date,
                     'return_date' => $request->return_date,
@@ -132,6 +109,9 @@ class RentalController extends Controller
             }
             // dd($data);
             Rental::insert($data);
+            if ($request->status == 1) {
+                Item::whereIn('id', $request->item)->update(['status' => 2]);
+            }
             return response()->json([
                 'message' => 'Pengadaan Barang berhasil disimpan',
                 'status' => true,

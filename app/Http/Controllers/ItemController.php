@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\DataTables;
+use PDF;
 
 class ItemController extends Controller
 {
@@ -37,6 +38,7 @@ class ItemController extends Controller
                         <a class="dropdown-item" href="javascript:void(0)" onclick="detailData(' . $row['id'] . ')"><i class="la la-info-circle"></i> Detail</a>
                         <a class="dropdown-item" href="javascript:void(0)" onclick="editData(' . $row['id'] . ')"><i class="la la-edit"></i> Edit</a>
                         <a class="dropdown-item" href="javascript:void(0)" onclick="deleteData(' . $row['id'] . ')"><i class="la la-trash"></i> Hapus</a>
+                        <a class="dropdown-item" href="' . route('item.print_qr', ['code' => $row['code']]) . '" target="_blank"><i class="la la-qrcode"></i> Cetak QR</a>
                     </div>
                 </span>';
                 })
@@ -213,12 +215,16 @@ class ItemController extends Controller
             $items = $items->where('items.id_location', $request->id_location);
         $table = datatables()->of($items)
             ->addColumn('checkbox', function ($item) {
-                return '<div class="m-checkbox-list">
+                if ($item['status'] == 1) {
+                    return '<div class="m-checkbox-list">
                 <label class="m-checkbox">
                     <input type="checkbox" name="item[]" value="' . $item['id'] . '" class="check_items">&nbsp;
                     <span></span>
                 </label>
             </div>';
+                } else {
+                    return '-';
+                }
             });
         $table->addColumn('location', function ($item) {
             return $item->locations != null ? $item->locations->name : '-';
@@ -277,5 +283,13 @@ class ItemController extends Controller
                 ], 302);
             }
         }
+    }
+
+    public function print_qr()
+    {
+        // $qrcode = base64_encode(QrCode::format('svg')->size(200)->errorCorrection('H')->generate('string'));
+        return view('content.barcodes.v_qr');
+        $pdf = PDF::loadView('content.barcodes.v_qr');
+        return $pdf->stream();
     }
 }

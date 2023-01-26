@@ -77,11 +77,12 @@
         </div>
     </div>
     @push('modals')
-        <div class="modal fade" id="modalFilter" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        <div class="modal fade" id="modalPrint" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
             aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <form class="m-form m-form--fit m-form--label-align-right" id="formFilter">
+                    <form class="m-form m-form--fit m-form--label-align-right" id="formSubmit" action="" method="POST">
+                        @csrf
                         <div class="modal-header">
                             <h5 class="modal-title">Filter</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -89,41 +90,24 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <div class="form-group">
-                                <label>Kategori Barang</label>
-                                <select class="form-control m-input" id="category_filter" name="category_filter">
-                                    <option value="" disabled selected>-- Pilih Kategori --</option>
-                                    @foreach ($category as $ct)
-                                        <option value="{{ $ct['id'] }}">{{ $ct['name'] }}</option>
-                                    @endforeach
-                                </select>
+                            <input type="hidden" name="id" id="id_stuff">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Jumlah QR horizontal</label>
+                                        <input type="text" class="form-control" name="amount_horizontal" id="amount_horizontal">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Jumlah QR vertical</label>
+                                        <input type="text" class="form-control" name="amount_vertical" id="amount_vertical">
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Tipe</label>
-                                <select class="form-control m-input" id="type_filter" name="type_filter">
-                                    <option value="" disabled selected>-- Pilih Tipe --</option>
-                                    @foreach ($type as $tp)
-                                        <option value="{{ $tp['id'] }}">{{ $tp['name'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Satuan</label>
-                                <select class="form-control m-input" id="unit_filter" name="unit_filter">
-                                    <option value="" disabled selected>-- Pilih Satuan --</option>
-                                    @foreach ($unit as $un)
-                                        <option value="{{ $un['id'] }}">{{ $un['name'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Supplier</label>
-                                <select class="form-control m-input" id="supplier_filter" name="supplier_filter">
-                                    <option value="" disabled selected>-- Pilih Supplier --</option>
-                                    @foreach ($supplier as $sp)
-                                        <option value="{{ $sp['id'] }}">{{ $sp['name'] }}</option>
-                                    @endforeach
-                                </select>
+                                <label>Total gambar per halaman</label>
+                                <input type="text" class="form-control" name="total_per_page">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -191,80 +175,14 @@
                         },
                     ]
                 });
-
-                $('#formSubmit').on('submit', function(event) {
-                    event.preventDefault();
-                    console.log('tes');
-                    $("#btnSubmit").addClass('m-loader m-loader--light m-loader--right');
-                    $("#btnSubmit").attr("disabled", true);
-                    $.ajax({
-                        url: "",
-                        method: "POST",
-                        data: $(this).serialize(),
-                        dataType: "json",
-                        success: function(data) {
-                            $('#formSubmit').trigger("reset");
-                            $('#modalForm').modal('hide');
-                            $('.datatable').dataTable().fnDraw(false);
-                            $('#btnSubmit').removeClass('m-loader m-loader--light m-loader--right');
-                            $("#btnSubmit").attr("disabled", false);
-                        },
-                        error: function(data) {
-                            const res = data.responseJSON;
-                            toastr.error(res.message, "GAGAL");
-                            console.log(data);
-                            $('#btnSubmit').removeClass('m-loader m-loader--light m-loader--right');
-                            $("#btnSubmit").attr("disabled", false);
-                        }
-                    });
-                });
             });
 
-            function addData() {
-                $('#id_type').val("");
+            function printData(id)
+            {
                 $('#formSubmit').trigger("reset");
-                $('#modal-title').html("Tambah {{ session('title') }}");
-                $('#modalForm').modal('show');
-            }
-
-            function editData(id) {
-                $.ajax({
-                    url: "{{ route('type.detail') }}",
-                    data: {
-                        id
-                    },
-                    success: function(data) {
-                        $('.modal-title').html("Edit {{ session('title') }}");
-                        $('#id_type').val(data.id);
-                        $('#name').val(data.name);
-                        $('#group').val(data.group).trigger('change');
-                        $('#modalForm').modal('show');
-                    }
-                });
-            }
-
-            function deleteData(id) {
-                if (confirm("Apa kamu yakin ingin menghapus data ini?") == true) {
-                    $.ajax({
-                        url: "{{ route('type.delete') }}",
-                        data: {
-                            id
-                        },
-                        success: function(data) {
-
-                            $('.datatable').dataTable().fnDraw(false);
-                        },
-                        error: function(data) {
-                            const res = data.responseJSON;
-                            toastr.error(res.message, "GAGAL");
-                        }
-                    })
-                }
-            }
-
-            function filterData() {
-                $('#formFilter').trigger("reset");
-                $('#modalFilter').modal('show');
+                $('#id_stuff').val(id);
+                $('.modal-title').html("Opsi Cetak QR CODE");
+                $('#modalPrint').modal('show');
             }
         </script>
     @endpush

@@ -52,6 +52,9 @@
                                 case 'rejected':
                                     $title = 'Peminjaman Ditolak';
                                     break;
+                                case 'finished':
+                                    $title = 'Peminjaman Selesai';
+                                    break;
                                 default:
                                     $title = 'Semua Peminjaman';
                                     break;
@@ -73,6 +76,8 @@
                                     class="la la-check-circle"></i> Peminjaman Diterima</a>
                             <a class="dropdown-item" href="{{ route('rental.home', ['status' => 'rejected']) }}"><i
                                     class="la la-close"></i> Peminjaman Ditolak</a>
+                            <a class="dropdown-item" href="{{ route('rental.home', ['status' => 'finished']) }}"><i
+                                    class="la la-align-justify"></i> Peminjaman Selesai</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{{ route('rental.home', ['status' => 'all-rentals']) }}"><i
                                     class="la la-copy"></i> Semua Peminjaman</a>
@@ -95,11 +100,6 @@
                                 onclick="addData()" type="button">
                                 <i class="fas fa-plus"></i>
                             </button>
-                            {{-- <button class="btn btn-success m-btn m-btn--custom m-btn--icon m-btn--air my-2"
-                            type="button">
-                            <span>
-                                <i class="la la-file-text-o"></i>
-                            </span></button> --}}
                         </div>
                         <select name="" id="group-status" class="form-control my-2">
                             <option value="" selected disabled>-- Filter berdasarkan jenis --</option>
@@ -123,7 +123,6 @@
                                     <th>Tanggal Kembali</th>
                                     <th>Keterangan</th>
                                     <th></th>
-                                    <th></th>
                                 </tr>
                             </thead>
                         </table>
@@ -146,8 +145,8 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Peminjam</label>
-                                <select name="id_user" id="id_user" required class="form-control m-bootstrap-select m_selectpicker"
-                                    data-live-search="true">
+                                <select name="id_user" id="id_user" required
+                                    class="form-control m-bootstrap-select m_selectpicker" data-live-search="true">
                                     <option></option>
                                     @foreach ($user as $us)
                                         <option value="{{ $us['id'] }}">{{ $us['name'] }}</option>
@@ -177,13 +176,26 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-12 my-3 d-none" id="display-item">
-                                    <div class="m-scrollable" data-scrollbar-shown="true" data-scrollable="true"
-                                        data-height="100" style="overflow:hidden; height: 100px">
-                                        <div class="row" id="list-item"></div>
-                                    </div>
-                                </div>
                             </div>
+                            {{-- <div class="table-responsive"> --}}
+                            <table class="table table-hover datatable-item">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div class="m-checkbox-list">
+                                                <label class="m-checkbox mb-0">
+                                                    <input type="checkbox" id="select-all" class="check_items">&nbsp;
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </th>
+                                        <th>Item</th>
+                                        <th>Lokasi</th>
+                                        <th>Kondisi</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                            {{-- </div> --}}
                             <div class="row mt-3">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -330,18 +342,16 @@
                             <center>
                                 <h5>Konfirmasi Barang Kembali</h5>
                                 <i class="m-nav__link-icon flaticon-safe-shield-protection fa-5x text-primary"></i>
-                                <div class="form-group m-form__group row">
+                                <div class="form-group m-form__group text-center">
                                     <input type="hidden" name="id" id="c_id_rental">
-                                    <label class="col-form-label col-lg-4 col-sm-12">Tanggal Pengembalian</label>
-                                    <div class="col-lg-8 col-sm-12">
-                                        <div class="input-group date">
-                                            <input type="text" name="returned_date" id="returned_date"
-                                                class="form-control m-input m_datetimepicker_3" readonly
-                                                placeholder="Select date & time" />
-                                            <div class="input-group-append">
-                                                <span class="input-group-text"><i
-                                                        class="la la-calendar-check-o glyphicon-th"></i></span>
-                                            </div>
+                                    <label for="exampleInputEmail1">Tanggal Pengembalian</label>
+                                    <div class="input-group date">
+                                        <input type="text" name="returned_date" id="returned_date"
+                                            class="form-control m-input m_datetimepicker_3" readonly
+                                            value="{{ now() }}" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text"><i
+                                                    class="la la-calendar-check-o glyphicon-th"></i></span>
                                         </div>
                                     </div>
                                 </div>
@@ -373,12 +383,12 @@
 
 
                 $('#id_stuff').change(function() {
-                    loadItem($(this).val(), $('#id_location').val());
+                    reloadDatatableItem($(this).val(), $('#id_location').val());
                 });
 
 
                 $('#id_location').change(function() {
-                    loadItem($('#id_stuff').val(), $(this).val());
+                    reloadDatatableItem($('#id_stuff').val(), $(this).val());
                 });
 
 
@@ -446,6 +456,11 @@
                     ]
                 });
 
+                $("#select-all").click(function(e) {
+                    var table = $(e.target).closest('table');
+                    $('td input:checkbox', table).prop('checked', this.checked);
+                });
+
                 $('#group-status').on('change', function() {
                     // console.log(this.value);
                     table.search(this.value).draw();
@@ -480,9 +495,49 @@
                         });
                     }
                 });
+
+                $('body').on('submit', '#formSubmit', function(e) {
+                    e.preventDefault();
+                    let items = [];
+                    $(".check_items:checked").each(function() {
+                        items.push($(this).val());
+                    });
+                    if (items.length > 0) {
+                        $.ajax({
+                            url: '',
+                            type: "POST",
+                            data: new FormData(this),
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            beforeSend: function() {
+                                $('#btnSubmit').addClass(
+                                    'm-loader m-loader--light m-loader--right');
+                                $('#btnSubmit').attr("disabled", true);
+                            },
+                            success: function(data) {
+                                $('#formSubmit').trigger("reset");
+                                $('#modalForm').modal('hide');
+                                $('.datatable').dataTable().fnDraw(false);
+                                $('#btnSubmit').removeClass(
+                                    'm-loader m-loader--light m-loader--right');
+                                $('#btnSubmit').attr("disabled", false);
+                            },
+                            error: function(data) {
+                                const res = data.responseJSON;
+                                toastr.error(res.message, "GAGAL");
+                                $('#btnSubmit').removeClass(
+                                    'm-loader m-loader--light m-loader--right');
+                                $('#btnSubmit').attr("disabled", false);
+                            }
+                        });
+                    } else {
+                        alert('anda belum memilih item yang akan dipinjam');
+                    }
+                });
             });
 
-            formSubmit('#formSubmit', '#btnSubmit', '', '#modalForm');
+
             formSubmit('#formEditSubmit', '#btnUpdate', '{{ route('rental.update') }}', '#modalEditForm');
             formSubmit('#formConfirm', '#btnConfirm', '{{ route('rental.confirm-returned_date') }}', '#modalConfirm');
 
@@ -493,6 +548,7 @@
                 $('#modal-title').html("Tambah {{ session('title') }}");
                 $('#modalForm').modal('show');
                 $('#display-item').addClass('d-none');
+                reloadDatatableItem();
             }
 
             function detailData(id) {
@@ -649,44 +705,88 @@
                 return false;
             }
 
-            function loadItem(id_stuff, id_location) {
+            // function loadItem(id_stuff, id_location) {
 
-                var notempty = id_stuff && id_location;
-                if (notempty) {
-                    $('#display-item').removeClass('d-none');
-                    $.ajax({
-                        url: "{{ route('item.location_item') }}",
-                        data: {
-                            id_stuff,
-                            id_location
-                        },
-                        success: function(data) {
-                            let script_item = '';
-                            if (data.length > 0) {
-                                data.forEach(function(item) {
-                                    script_item += `<div class="col-md-4">
-                                                <div class="m-checkbox-list">
-                                                    <label class="m-checkbox m-checkbox--success">
-                                                        <input type="checkbox" name="item[` + item.id + `]"> ` + item
-                                        .name + `
-                                                        <span></span>
-                                                    </label>
-                                                </div>
-                                            </div>`;
-                                });
-                            } else {
-                                script_item += `<div class="col-md-12">
-                                                <h5 class="text-center text-danger">Data Item saat ini tidak tersedia</h5>
-                                            </div>`;
-                            }
-                            $('#list-item').html(script_item);
-                        },
-                        error: function(data) {
-                            const res = data.responseJSON;
-                            toastr.error(res.message, "GAGAL");
+            //     var notempty = id_stuff && id_location;
+            //     if (notempty) {
+            //         $('#display-item').removeClass('d-none');
+            //         $.ajax({
+            //             url: "{{ route('item.location_item') }}",
+            //             data: {
+            //                 id_stuff,
+            //                 id_location
+            //             },
+            //             success: function(data) {
+            //                 let script_item = '';
+            //                 if (data.length > 0) {
+            //                     data.forEach(function(item) {
+            //                         script_item += `<div class="col-md-4">
+    //                                     <div class="m-checkbox-list">
+    //                                         <label class="m-checkbox m-checkbox--success">
+    //                                             <input type="checkbox" name="item[` + item.id + `]"> ` + item
+            //                             .name + `
+    //                                             <span></span>
+    //                                         </label>
+    //                                     </div>
+    //                                 </div>`;
+            //                     });
+            //                 } else {
+            //                     script_item += `<div class="col-md-12">
+    //                                     <h5 class="text-center text-danger">Data Item saat ini tidak tersedia</h5>
+    //                                 </div>`;
+            //                 }
+            //                 $('#list-item').html(script_item);
+            //             },
+            //             error: function(data) {
+            //                 const res = data.responseJSON;
+            //                 toastr.error(res.message, "GAGAL");
+            //             }
+            //         })
+            //     }
+            // }
+
+            function reloadDatatableItem(id_stuff = null, id_location = null) {
+                console.log(id_stuff, id_location);
+                var table = $('.datatable-item').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    bDestroy: true,
+                    bFilter: false,
+                    bInfo: false,
+                    lengthChange: false,
+                    ajax: {
+                        url: "{{ route('item.datatable_location_stuff') }}",
+                        data: function(d) {
+                            d.id_stuff = id_stuff;
+                            d.id_location = id_location;
                         }
-                    })
-                }
+                    },
+                    columns: [{
+                            data: 'checkbox',
+                            name: 'checkbox',
+                            orderable: false,
+                            searchable: false,
+                            className: 'align-middle text-center'
+                        },
+                        {
+                            data: 'code',
+                            name: 'code',
+                            className: 'text-capitalize align-middle'
+                        },
+                        {
+                            data: 'location',
+                            name: 'location',
+                            className: 'align-middle'
+                        },
+                        {
+                            data: 'condition',
+                            name: 'condition',
+                            className: 'align-middle text-center'
+                        },
+
+                    ]
+                });
             }
         </script>
     @endpush

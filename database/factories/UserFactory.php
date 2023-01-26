@@ -15,20 +15,18 @@ class UserFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'role' => $this->faker->randomElement(['student','teacher','staff','other']),
+            'position' => $this->faker->randomElement(['student', 'teacher', 'staff', 'other']),
             'phone' => $this->faker->phoneNumber(),
-            'gender' => $this->faker->randomElement(['male','female']),
+            'gender' => $this->faker->randomElement(['male', 'female']),
             'place_of_birth' => $this->faker->city(),
             'date_of_birth' => $this->faker->date($format = 'Y-m-d', $max = 'now'),
-            'religion' => $this->faker->randomElement(['islam','hindu','protestan','katholik', 'buddha', 'konghucu']),
+            'religion' => $this->faker->randomElement(['islam', 'hindu', 'protestan', 'katholik', 'buddha', 'konghucu']),
             'address' => $this->faker->streetAddress(),
             'last_ip' => $this->faker->ipv4(),
             'last_login' => $this->faker->dateTime($max = 'now', $timezone = null),
-            'status' => $this->faker->randomElement(['0','1']),
+            'status' => $this->faker->randomElement(['0', '1']),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => 12345,
         ];
     }
-
-
 }

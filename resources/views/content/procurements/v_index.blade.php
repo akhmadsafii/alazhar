@@ -168,14 +168,15 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label>Prioritas</label>
+                                <select name="priority" required id="priority" class="form-control">
+                                    <option value="">-- Level Prioritas --</option>
+                                    <option value="normal">Normal</option>
+                                    <option value="urgent">Mendesak</option>
+                                </select>
+                            </div>
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Kode Item</label>
-                                        <input type="text" class="form-control" name="code" id="code">
-                                        <small>*Kosongi untuk membuat kode default</small>
-                                    </div>
-                                </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Jumlah Barang</label>
@@ -189,20 +190,10 @@
                                         <input type="text" required class="form-control ribuan" name="unit_price" id="unit_price">
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label>Prioritas</label>
-                                        <select name="priority" required id="priority" class="form-control">
-                                            <option value="">-- Level Prioritas --</option>
-                                            <option value="normal">Normal</option>
-                                            <option value="urgent">Mendesak</option>
-                                        </select>
-                                    </div>
-                                </div>
                             </div>
                             <div class="form-group">
-                                <label>Tanggal Diterima</label>
-                                <input type="text" readonly name="date_received" id="date_received"
+                                <label>Tanggal Pengadaan</label>
+                                <input type="text" readonly name="date_of_filing" id="date_of_filing"
                                     value="{{ date('Y/m/d', strtotime(now())) }}" class="form-control m_datetimepicker_6">
                             </div>
                             <div class="form-group">

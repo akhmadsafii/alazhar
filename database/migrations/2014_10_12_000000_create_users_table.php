@@ -19,9 +19,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('phone')->nullable();
-            $table->enum('role', ['student', 'teacher', 'staff', 'other']);
-            // $table->string('registration_number')->unique();
-            // $table->timestamp('email_verified_at')->nullable();
+            $table->enum('position', ['student', 'teacher', 'staff', 'other']);
             $table->string('password');
             $table->enum('gender', ['male', 'female']);
             $table->string('place_of_birth')->nullable();

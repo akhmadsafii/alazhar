@@ -21,11 +21,11 @@
 
     .item {
         border: 1px solid black;
-        width: 29%;
-        /* position: relative; */
+        width: 22%;
         display: inline-block;
         padding: 5px;
-        text-align: center
+        text-align: center;
+        margin: 2px 0
     }
 
     .kode {
@@ -51,13 +51,13 @@
             $no = 0;
         @endphp
         @foreach ($stuff->items as $data)
-            <div class="item">
+            <div class="item" style="position: relative">
                 <div class="barcode">
                     @php
                         $link = route('detail-item', ['item' => $data['code']]);
                     @endphp
                     <img src="data:image/png;base64,{{ DNS2D::getBarcodePNG("$link", 'QRCODE') }}" alt="barcode"
-                        style="width: 150px; height: 150px" />
+                        style="width: 105px; height: 105px; " />
                     <hr>
                     <p class="kode">{{ $data['code'] }}</p>
                     <h3 class="name">{{ strtoupper($stuff['name']) }}</h3>
@@ -66,9 +66,9 @@
             @php
                 ++$no;
             @endphp
-            @if ($no % 3 == 0)
+            @if ($no % 4 == 0)
                 <div class="spacing"></div>
-                @if ($no % 12 == 0)
+                @if ($no % 20 == 0)
                     <div class="page-break"></div>
                 @endif
             @endif
