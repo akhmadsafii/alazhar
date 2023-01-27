@@ -59,6 +59,10 @@
                     class="m-menu__link-icon flaticon-signs-2"></i><span class="m-menu__link-title"> <span
                         class="m-menu__link-wrap"> <span class="m-menu__link-text">Pemusnahan</span>
                     </span></span></a></li>
+                    <li class="m-menu__item {{ Route::is('depreciations.*') ? 'm-menu__item--active' : '' }}" aria-haspopup="true"><a href="{{ route('depreciation.home') }}" class="m-menu__link "><i
+                        class="m-menu__link-icon flaticon-stopwatch"></i><span class="m-menu__link-title"> <span
+                            class="m-menu__link-wrap"> <span class="m-menu__link-text">Penyusutan</span>
+                        </span></span></a></li>
         <li class="m-menu__item  m-menu__item--submenu {{ Route::is('report.*') ? 'm-menu__item--open m-menu__item--expanded' : '' }}"
             aria-haspopup="true" m-menu-submenu-toggle="hover"><a href="javascript:;"
                 class="m-menu__link m-menu__toggle"><i class="m-menu__link-icon flaticon-clipboard"></i><span

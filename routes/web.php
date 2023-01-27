@@ -7,6 +7,7 @@ use App\Http\Controllers\BrokenActionController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ConsumableController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepreciationController;
 use App\Http\Controllers\ExterminateController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\ItemController;
@@ -89,7 +90,7 @@ Route::prefix('user')->name('user.')->group(function () {
 Route::middleware('auth:admin')->group(function () {
     Route::prefix('dashboard')->name('admin.')->group(function () {
         Route::get('/', [DashboardController::class, 'admin'])->name('dashboard');
-        Route::get('statistic_chart', [DashboardController::class, 'statistic_chart'])->name('statistic');
+        Route::get('statistic_chart', [DashboardConftroller::class, 'statistic_chart'])->name('statistic');
         Route::get('not-back', [DashboardController::class, 'not_back'])->name('dashboard-not_back');
         Route::get('last-procurement', [DashboardController::class, 'last_procurement'])->name('dashboard-last_procurement');
     });
@@ -200,6 +201,16 @@ Route::middleware('auth:admin')->group(function () {
         Route::post('update', [ExterminateController::class, 'update'])->name('update');
         Route::get('delete', [ExterminateController::class, 'delete'])->name('delete');
         Route::get('update-status', [ExterminateController::class, 'update_status'])->name('update_status');
+    });
+
+    Route::prefix('depreciations')->name('depreciation.')->group(function () {
+        Route::get('/', [DepreciationController::class, 'index'])->name('home');
+        Route::post('/', [DepreciationController::class, 'store'])->name('store');
+        Route::get('detail', [DepreciationController::class, 'detail'])->name('detail');
+        Route::post('update', [DepreciationController::class, 'update'])->name('update');
+        Route::get('history', [DepreciationController::class, 'history'])->name('history');
+        // Route::get('delete', [ExterminateController::class, 'delete'])->name('delete');
+        // Route::get('update-status', [ExterminateController::class, 'update_status'])->name('update_status');
     });
 
     Route::prefix('rentals')->name('rental.')->group(function () {

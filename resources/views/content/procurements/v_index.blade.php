@@ -119,7 +119,7 @@
                                     <th>Nama</th>
                                     <th>Barang</th>
                                     <th>Tanggal Pengajuan</th>
-                                    <th>Total</th>
+                                    <th>Nominal</th>
                                     <th></th>
                                     <th></th>
                                 </tr>
@@ -187,9 +187,18 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Harga Satuan</label>
-                                        <input type="text" required class="form-control ribuan" name="unit_price" id="unit_price">
+                                        <input type="text" class="form-control ribuan" name="unit_price" id="unit_price">
                                     </div>
                                 </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Sumber Dana</label>
+                                <select name="id_source" id="id_source" required class="form-control">
+                                    <option value="">-- Pilih Sumber Pendanaan --</option>
+                                    @foreach ($sources as $sc)
+                                        <option value="{{ $sc['id'] }}">{{ $sc['code'] }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label>Tanggal Pengadaan</label>
@@ -429,6 +438,7 @@
                         $('#name').val(data.name);
                         $('#priority').val(data.priority);
                         $('#amount').val(data.amount);
+                        $('#id_source').val(data.id_source).trigger('change');
                         $('#unit_price').val(rubahRibuan(data.unit_price));
                         $('#id_stuff').val(data.id_stuff).trigger('change');
                         $('#id_user').val(data.id_user).trigger('change');

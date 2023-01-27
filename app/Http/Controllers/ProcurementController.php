@@ -8,6 +8,7 @@ use App\Helpers\StatusHelper;
 use App\Http\Resources\ProcurementResource;
 use App\Models\Item;
 use App\Models\Procurement;
+use App\Models\Source;
 use App\Models\Stuff;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -24,6 +25,8 @@ class ProcurementController extends Controller
         }
         $user = User::where('status', '!=', 0)->get();
         $stuff = Stuff::where('status', '!=', 0)->get();
+        $sources = Source::where('status', '!=', 0)->get();
+        // dd($sources);
 
         $procurement =  Procurement::join('stuffs as st', 'st.id', '=', 'procurements.id_stuff')
             ->join('types as tp', 'tp.id', '=', 'st.id_type')
@@ -91,14 +94,19 @@ class ProcurementController extends Controller
                 ->make(true);
         }
         // dd($type);
-        return view('content.procurements.v_index', compact('stuff', 'user'));
+        return view('content.procurements.v_index', compact('stuff', 'user', 'sources'));
     }
     public function store(Request $request)
     {
         // dd($request);
         $data = $request->toArray();
-        $unit_price = str_replace('.', '', $request->unit_price);
-        $data['total_price'] = $request->amount * $unit_price;
+        $total_price = 0;
+        $unit_price = 0;
+        if ($request->unit_price) {
+            $unit_price = str_replace('.', '', $request->unit_price);
+            $total_price = $request->amount * $unit_price;
+        }
+        $data['total_price'] = $total_price;
         $data['status'] = 2;
         $data['unit_price'] = $unit_price;
         $result = Procurement::updateOrCreate(
@@ -141,39 +149,49 @@ class ProcurementController extends Controller
         ]);
         if ($request->status == 1) {
             $stuff = Stuff::find($procurement->id_stuff);
-            $amount = $stuff->amount + $procurement->amount;
-            $stuff->update(['amount' => $amount]);
             if ($stuff->status_bhp != 1) {
-                $code_item = $procurement->code ?? GeneralHelper::getInital($stuff->name);
-                $item = Item::where('name', 'like', "%$code_item%")->orderBy('id', 'asc')->get()->last();
+                $source = Source::find($procurement->id_source);
+                $code = $stuff['code'] . '-' . $source['code'];
+                $item = Item::where('code', 'like', "$code%")->orderBy('id', 'asc')->get()->last();
                 if ($item == null) {
                     $data_item = [];
                     for ($i = 1; $i <= $procurement->amount; $i++) {
                         $data_item[] = [
                             'id_stuff' => $procurement->id_stuff,
-                            'name' => $code_item . '-' . $i,
+                            'code' => $code . '.' . $i,
                             'condition' => 'good',
-                            'created_at' => now(),
+                            'id_source' => $procurement->id_source,
+                            'date_received' => now(),
+                            'id_procurement' => $procurement->id,
+                            'price' => $procurement->unit_price ? str_replace('.', '', $procurement->unit_price) : null,
+                            'created_at' => now()
                         ];
                     }
                     Item::insert($data_item);
                 } else {
-                    $code = explode('-', $item->name);
-                    $getnumber = end($code);
+                    $code_base = explode('.', $item->code);
+                    $getnumber = end($code_base);
                     $start = $getnumber + 1;
-                    $finish = $getnumber + $request->amount;
+                    $finish = $getnumber + $procurement->amount;
                     $data_item = [];
                     for ($i = $start; $i <= $finish; $i++) {
                         $data_item[] = [
                             'id_stuff' => $procurement->id_stuff,
-                            'name' => $code_item . '-' . $i,
+                            'code' => $code . '.' . $i,
                             'condition' => 'good',
-                            'created_at' => now(),
+                            'id_source' => $procurement->id_source,
+                            'date_received' => now(),
+                            'id_procurement' => $procurement->id,
+                            'price' => $procurement->unit_price ? str_replace('.', '', $procurement->unit_price) : null,
+                            'created_at' => now()
                         ];
                     }
                     Item::insert($data_item);
                 }
             }
+            $procurement->update([
+                'date_received' => now()
+            ]);
         }
         return response()->json([
             'message' => 'Status berhasil diupdate',

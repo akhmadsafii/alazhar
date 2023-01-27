@@ -2,7 +2,6 @@
 @section('content')
     @push('styles')
         @include('package.datatable.datatable_css')
-        {{-- @include('package.select2.select2_css') --}}
     @endpush
     <div class="m-subheader ">
         <div class="d-flex align-items-center">
@@ -33,54 +32,6 @@
     <div class="m-content">
         <div class="m-portlet">
             <div class="m-portlet__head">
-                <div class="w-100 m-portlet__head-tools d-flex justify-content-between">
-                    <a href="#" class="btn btn-secondary m-btn m-btn--icon m-btn--wide m-btn--md m--margin-right-10">
-                        <span>
-                            <i class="la la-arrow-left"></i>
-                            <span>Back</span>
-                        </span>
-                    </a>
-                    <div class="btn-group">
-                        @php
-                            switch ($_GET['status']) {
-                                case 'submission':
-                                    $title = 'Pengajuan Pemusnahan';
-                                    break;
-                                case 'approved':
-                                    $title = 'Pemusnahan Diterima';
-                                    break;
-                                case 'rejected':
-                                    $title = 'Pemusnahan Ditolak';
-                                    break;
-                                default:
-                                    $title = 'Semua Pemusnahan';
-                                    break;
-                            }
-                        @endphp
-                        <button type="button" class="btn btn-info  m-btn m-btn--icon m-btn--wide m-btn--md">
-                            <span>
-                                <i class="la la-check"></i>
-                                <span>{{ $title }}</span>
-                            </span>
-                        </button>
-                        <button type="button" class="btn btn-info  dropdown-toggle dropdown-toggle-split m-btn m-btn--md"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="{{ route('exterminate.home', ['status' => 'submission']) }}"><i
-                                    class="la la-plus"></i> Pengajuan Peminjaman</a>
-                            <a class="dropdown-item" href="{{ route('exterminate.home', ['status' => 'approved']) }}"><i
-                                    class="la la-check-circle"></i> Peminjaman Diterima</a>
-                            <a class="dropdown-item" href="{{ route('exterminate.home', ['status' => 'rejected']) }}"><i
-                                    class="la la-close"></i> Peminjaman Ditolak</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{ route('exterminate.home', ['status' => 'all-rentals']) }}"><i
-                                    class="la la-copy"></i> Semua Peminjaman</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="m-portlet__head">
                 <div class="m-portlet__head-caption">
                     <div class="m-portlet__head-title">
                         <h3 class="m-portlet__head-text">
@@ -95,16 +46,11 @@
                                 onclick="addData()" type="button">
                                 <i class="fas fa-plus"></i>
                             </button>
-                            {{-- <button class="btn btn-success m-btn m-btn--custom m-btn--icon m-btn--air my-2"
-                            type="button">
-                            <span>
-                                <i class="la la-file-text-o"></i>
-                            </span></button> --}}
                         </div>
                         <select name="" id="group-status" class="form-control my-2">
                             <option value="" selected disabled>-- Filter berdasarkan jenis --</option>
-                            <option value="filter sarana">Sarana</option>
-                            <option value="filter prasarana">Prasarana</option>
+                            <option value="sarana">Sarana</option>
+                            <option value="prasarana">Prasarana</option>
                         </select>
                     </div>
                 </div>
@@ -116,11 +62,13 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
+                                    <th></th>
+                                    <th>Tanggal</th>
                                     <th>Kode</th>
                                     <th>Barang</th>
-                                    <th>Tanggal Pengajuan</th>
-                                    <th>Keterangan</th>
-                                    <th>Status</th>
+                                    <th>Harga Awal</th>
+                                    <th>Penyusutan</th>
+                                    <th>Harga Akhir</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -143,6 +91,11 @@
                             </button>
                         </div>
                         <div class="modal-body">
+                            <div class="form-group">
+                                <label>Tanggal Penyusutan</label>
+                                <input type="text" class="form-control m_datetimepicker_6" readonly
+                                    value="{{ date('Y/m/d', strtotime(now())) }}" name="date">
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -173,6 +126,7 @@
                                         class="table table-striped- table-bordered table-hover table-checkable datatable-item">
                                         <thead>
                                             <tr>
+
                                                 <th width="20">
                                                     <div class="m-checkbox-list">
                                                         <label class="m-checkbox">
@@ -190,34 +144,10 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="row mt-3">
-                                <div class="col-md-8">
-                                    <div class="form-group">
-                                        <label>Keterangan</label>
-                                        <textarea name="description" id="description" rows="3" class="form-control"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Bukti File</label>
-                                        <input type="file" name="file" id="file" class="form-control-file"
-                                            accept="image/*" onchange="readURL(this);">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <img id="modal-preview" src="https://via.placeholder.com/150" alt="Preview"
-                                        class="w-100">
-                                </div>
-                            </div>
                             <div class="form-group">
-                                <label>Tanggal Pengajuan</label>
-                                <div class="input-group date">
-                                    <input type="text" name="extermination_date" id="extermination_date"
-                                        class="form-control m-input m_datetimepicker_3" readonly
-                                        value="{{ now() }}" />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i
-                                                class="la la-calendar-check-o glyphicon-th"></i></span>
-                                    </div>
-                                </div>
+                                <label>Nilai Penyusutan</label>
+                                <input type="text" class="form-control ribuan" name="price">
+                                <span class="m-form__help">Harap diisi dengan harga rupiah.</span>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -228,11 +158,10 @@
                 </div>
             </div>
         </div>
-
-        <div class="modal fade" id="modalEditForm" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="modalEdit" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
-                    <form class="m-form m-form--fit m-form--label-align-right" id="formEditSubmit">
+                    <form class="m-form m-form--fit m-form--label-align-right" id="formUpdate">
                         <div class="modal-header">
                             <h5 class="modal-title" id="modal-edit_title"></h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -240,52 +169,37 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <input type="hidden" name="id" id="id_exterminate">
                             <div class="form-group">
-                                <label>Barang</label>
-                                <select name="id_stuff" id="e_id_stuff"
-                                    class="form-control m-bootstrap-select m_selectpicker" data-live-search="true"
-                                    onchange="getItem(this)">
-                                    <option selected disabled>-- Pilih Barang --</option>
-                                    @foreach ($stuff as $st)
-                                        <option value="{{ $st['id'] }}">{{ $st['name'] }}</option>
-                                    @endforeach
-                                </select>
+                                <label>Tanggal Penyusutan</label>
+                                <input type="text" class="form-control m_datetimepicker_6" name="date" readonly
+                                    id="edit_date">
                             </div>
                             <div class="form-group">
-                                <label>Item</label>
-                                <select name="id_item" id="e_id_item" class="form-control m-bootstrap-select m_selectpicker"
-                                    data-live-search="true">
-                                </select>
+                                <input type="hidden" name="id" id="id_depreciation">
+                                <label>Item Barang</label>
+                                <input type="hidden" name="id_item" id="edit_id_item">
+                                <input type="text" class="form-control" readonly id="edit_item">
                             </div>
+
                             <div class="row">
-                                <div class="col-lg-8">
+                                <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Keterangan</label>
-                                        <textarea name="description" id="e_description" rows="3" class="form-control"></textarea>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>File</label>
-                                        <input type="file" name="file" id="e_file" class="form-control-file"
-                                            accept="image/*" onchange="readURLS(this);">
+                                        <label>Harga Awal</label>
+                                        <input type="text" class="form-control" name="initial_price" readonly
+                                            id="edit_initial_price">
                                     </div>
                                 </div>
-                                <div class="col-lg-4">
-                                    <img id="modal-previews" src="https://via.placeholder.com/150" alt="Preview"
-                                        class="w-100">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Harga Penyusutan</label>
+                                        <input type="text" class="form-control" name="price" id="edit_price">
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Tanggal Pengajuan</label>
-                                <div class="input-group date">
-                                    <input type="text" name="extermination_date" id="e_extermination_date"
-                                        class="form-control m-input m_datetimepicker_3" readonly
-                                        value="{{ now() }}" />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text"><i
-                                                class="la la-calendar-check-o glyphicon-th"></i></span>
-                                    </div>
-                                </div>
+                                <label>Harga Akhir</label>
+                                <input type="text" class="form-control" name="final_price" readonly
+                                    id="edit_final_price">
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -296,115 +210,15 @@
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="modalDetail" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Informasi Detail</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row" id="content-confirm">
-                            <div class="col-lg-6">
-                                <div class="form-group m-form__group">
-                                    <label>Barang :</label>
-                                    <p class="form-control-static font-weight-bold">${rental.users.name}</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-group m-form__group">
-                                    <label>Kode Item :</label>
-                                    <p class="form-control-static font-weight-bold">${rental.stuffs.name}</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-group m-form__group">
-                                    <label>Tanggal Pengajuan :</label>
-                                    <p class="form-control-static font-weight-bold">${rental.stuffs.name}</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-group m-form__group">
-                                    <label>Status :</label>
-                                    <p class="form-control-static font-weight-bold">${rental.stuffs.name}</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <img src="" class="w-100" alt="">
-                            </div>
-                            <div class="col-lg-8">
-                                <div class="form-group m-form__group">
-                                    <label>Keterangan :</label>
-                                    <p class="form-control-static font-weight-bold">${rental.e_return_date}</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-12">
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
-                                    <div class="action">
-                                        <button type="button" onclick="changeStatus(${rental.id}, 3)"
-                                            class="btn btn-danger">Tolak</button>
-
-                                        <button type="button" onclick="changeStatus(${rental.id}, 1)"
-                                            class="btn btn-success">Terima</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{-- <div class="modal fade" id="modalConfirm" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <form class="m-form m-form--fit m-form--label-align-right" id="formConfirm">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <center>
-                                <h5>Konfirmasi Barang Kembali</h5>
-                                <i class="m-nav__link-icon flaticon-safe-shield-protection fa-5x text-primary"></i>
-                                <div class="form-group m-form__group row">
-                                    <input type="hidden" name="id" id="c_id_rental">
-                                    <label class="col-form-label col-lg-4 col-sm-12">Tanggal Pengembalian</label>
-                                    <div class="col-lg-8 col-sm-12">
-                                        <div class="input-group date">
-                                            <input type="text" name="returned_date" id="returned_date"
-                                                class="form-control m-input m_datetimepicker_3" readonly
-                                                placeholder="Select date & time" />
-                                            <div class="input-group-append">
-                                                <span class="input-group-text"><i
-                                                        class="la la-calendar-check-o glyphicon-th"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </center>
-                        </div>
-                        <div class="modal-footer d-flex justify-content-between">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
-                            <div class="action">
-                                <button type="submit" class="btn btn-success" id="btnConfirm">Konfirmasi</a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> --}}
     @endpush
     @push('scripts')
+        @include('component.formSubmit')
         @include('package.datatable.datatable_js')
         @include('package.bootstrap-select.bootstrap-select_js')
         @include('package.datetimepicker.datetimepicker_js')
-        @include('component.formImageSubmit')
+        <script src="{{ asset('asset/plugins/ribuan.js') }}"></script>
         <script>
+            var table;
             $(function() {
                 $.ajaxSetup({
                     headers: {
@@ -412,22 +226,20 @@
                     }
                 });
 
-
-                // $('#id_stuff').change(function() {
-                //     loadItem($(this).val(), $('#id_location').val());
-                // });
-
-
-                // $('#id_location').change(function() {
-                //     loadItem($('#id_stuff').val(), $(this).val());
-                // });
-
-
-                var table = $('.datatable').DataTable({
+                table = $('.datatable').DataTable({
                     processing: true,
                     serverSide: true,
                     responsive: true,
-                    ajax: "",
+                    ajax: {
+                        url: "",
+                        data: function(d) {
+                            d.group = $('#group-status').val()
+                        }
+                    },
+                    order: [
+                        [1, 'desc']
+                    ],
+
                     dom: "<'row'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>\n\t\t\t<'row'<'col-sm-12'tr>>\n\t\t\t<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 dataTables_pager'lp>>",
                     buttons: [
                         "print",
@@ -442,30 +254,39 @@
                             orderable: false,
                             searchable: false,
                             className: 'align-middle'
+                        }, {
+                            data: 'id',
+                            name: 'id',
+                            visible: false,
+                        },
+                        {
+                            data: 'date',
+                            name: 'date',
                         },
                         {
                             data: 'code_item',
                             name: 'code_item',
-                        },
-                        {
-                            data: 'stuff',
-                            name: 'stuff',
                             className: 'align-middle'
                         },
                         {
-                            data: 'date_extermination',
-                            name: 'date_extermination',
+                            data: 'name',
+                            name: 'name',
                             className: 'align-middle'
                         },
                         {
-                            data: 'description',
-                            name: 'description',
-                            className: 'align-middle'
+                            data: 'initial_price',
+                            name: 'initial_price',
+                            className: 'align-middle text-right'
                         },
                         {
-                            data: 'status',
-                            name: 'status',
-                            className: 'align-middle'
+                            data: 'price',
+                            name: 'price',
+                            className: 'align-middle text-right'
+                        },
+                        {
+                            data: 'final_price',
+                            name: 'final_price',
+                            className: 'align-middle text-right'
                         },
                         {
                             data: 'action',
@@ -478,8 +299,10 @@
                 });
 
                 $('#group-status').on('change', function() {
-                    table.search(this.value).draw();
+                    table.draw();
                 });
+
+                formSubmit('#formUpdate', '#btnUpdate', '{{ route('depreciation.update') }}', '#modalEdit');
 
                 $("#select-all").click(function(e) {
                     var table = $(e.target).closest('table');
@@ -529,56 +352,67 @@
                                 $('#btnSubmit').attr("disabled", false);
                             }
                         });
-                    }else{
-                        alert('anda belum memilih item yang akan dimusnahkan');
+                    } else {
+                        alert('anda belum memilih item yang akan disusutkan');
                     }
                 });
 
-                formImageSubmit('#formEditSubmit', '#btnUpdate', '{{ route('exterminate.update') }}',
-                    '#modalEditForm');
+                // $("#edit_price").blur(function() {
+                //     var inital_price = removePoint($('#edit_inital_price').val());
+                //     var price = removePoint(this.value);
+                //     // $('#edit_price').keyup(function(event) {
+                //     // var price = removePoint(this.value);
+                //     console.log(price);
+                // });
+
+                $('#edit_price').on("focusout", function(event) {
+                    var price = parseFloat($(this).val().replace('.',''));
+                    var inital_price = parseFloat($('#edit_initial_price').val().replace('.',''));
+                    let final_price = inital_price - price;
+                    $('#edit_final_price').val(rubahRibuan(final_price));
+                });
 
 
             });
 
             function addData() {
-                $('#id_type').val("");
                 $(".m_selectpicker").val('default').selectpicker("refresh");
                 $('#formSubmit').trigger("reset");
                 $('#modal-title').html("Tambah {{ session('title') }}");
-                reloadItem();
                 reloadDatatableItem();
                 $('#modalForm').modal('show');
             }
 
             function editData(id) {
                 $.ajax({
-                    url: "{{ route('exterminate.detail') }}",
+                    url: "{{ route('depreciation.detail') }}",
                     data: {
                         id
                     },
                     success: function(data) {
                         $('#modal-edit_title').html("Edit {{ session('title') }}");
-                        $('#id_exterminate').val(data.id);
-                        $('#e_description').val(data.description);
-                        $('#e_extermination_date').val(data.extermination_date);
-                        $('#e_id_stuff').val(data.id_stuff).selectpicker('refresh');
-                        $('#modal-preview').attr('src', data.show_file);
-                        reloadItem(data.id_stuff, data.id_item);
-                        $('#modalEditForm').modal('show');
+                        $('#id_depreciation').val(data.id);
+                        $('#edit_id_item').val(data.id_item);
+                        $('#edit_item').val(data.items.code);
+                        $('#edit_date').val(data.date);
+                        $('#edit_initial_price').val(rubahRibuan(data.initial_price));
+                        $('#edit_price').val(data.price);
+                        $('#edit_final_price').val(rubahRibuan(data.final_price));
+                        $('#modalEdit').modal('show');
                     }
                 });
             }
 
 
             function reloadDatatableItem(id_stuff = null, id_location = null) {
-                console.log(id_stuff, id_location);
+                // console.log(id_stuff, id_location);
                 var table = $('.datatable-item').DataTable({
                     processing: true,
                     serverSide: true,
-                    responsive: true,
                     info: false,
                     searching: false,
                     lengthChange: false,
+                    responsive: true,
                     bDestroy: true,
                     ajax: {
                         url: "{{ route('item.datatable_location_stuff') }}",
@@ -588,8 +422,8 @@
                         }
                     },
                     columns: [{
-                            data: 'checkbox',
-                            name: 'checkbox',
+                            data: 'all_check',
+                            name: 'all_check',
                             orderable: false,
                             searchable: false,
                             className: 'align-middle text-center'
@@ -638,12 +472,12 @@
                             <div class="col-lg-6">
                                 <div class="form-group m-form__group">
                                     <label>Kode Item :</label>
-                                    <p class="form-control-static font-weight-bold">${exterminate.items.code}</p>
+                                    <p class="form-control-static font-weight-bold">${exterminate.items.name}</p>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group m-form__group">
-                                    <label>Tanggal Pengajuan :</label>
+                                    <label>Tanggal Pemusnahan :</label>
                                     <p class="form-control-static font-weight-bold">${exterminate.extermination_date}</p>
                                 </div>
                             </div>
@@ -700,24 +534,6 @@
                 }
             }
 
-            function reloadItem(id_stuff, id_item) {
-                $.ajax({
-                    url: "{{ route('item.load_item_stuff') }}",
-                    data: {
-                        id_stuff,
-                        id_item
-                    },
-                    beforeSend: function() {
-                        $('#e_id_item').html('<option value="">--- No Item Found ---</option>');
-                    },
-                    success: function(item) {
-                        $('#e_id_item').html(item).selectpicker('refresh');
-                        $('#e_id_item').removeAttr('disabled');
-                    }
-                });
-                return false;
-            }
-
             function changeStatus(id, status, evt) {
                 $(evt).addClass('m-loader m-loader--light m-loader--right');
                 $(evt).attr("disabled", true);
@@ -756,7 +572,7 @@
                     success: function(items) {
                         let content_item = '';
                         items.forEach(function(item) {
-                            content_item += '<option value="' + item.id + '">' + item.code + '</option>';
+                            content_item += '<option value="' + item.id + '">' + item.name + '</option>';
                         })
                         $('#e_id_item').html(content_item).selectpicker('refresh');
                     }

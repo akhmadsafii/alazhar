@@ -13,16 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('exterminations', function (Blueprint $table) {
+        Schema::create('depreciations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code')->nullable();
-            $table->bigInteger('id_stuff')->nullable();
+            $table->date('date')->nullable();
             $table->bigInteger('id_item');
-            $table->string('file')->nullable();
-            $table->dateTime('extermination_date')->nullable();
-            $table->date('exterminated_date')->nullable();
-            $table->text('description')->nullable();
-            $table->tinyInteger('status')->default(2);
+            $table->bigInteger('initial_price')->nullable();
+            $table->bigInteger('price')->nullable();
+            $table->bigInteger('final_price')->nullable();
+            $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });
     }
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('exterminations');
+        Schema::dropIfExists('depreciations');
     }
 };

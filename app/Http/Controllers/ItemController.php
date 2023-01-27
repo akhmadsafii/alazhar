@@ -148,9 +148,10 @@ class ItemController extends Controller
     public function load_stuff(Request $request)
     {
         $item = Item::where('id_stuff', $request->id_stuff)->get();
+        // dd($item);
         $output = '';
         foreach ($item as $it) {
-            $output .= '<option value="' . $it['id'] . '" ' . (($it['id'] == $request->id_item) ? 'selected' : '') . '>' . $it['name'] . '</option>';
+            $output .= '<option value="' . $it['id'] . '" ' . (($it['id'] == $request->id_item) ? 'selected' : '') . '>' . $it['code'] . '</option>';
         }
         return $output;
     }
@@ -229,6 +230,13 @@ class ItemController extends Controller
         $table->addColumn('location', function ($item) {
             return $item->locations != null ? $item->locations->name : '-';
         });
+        $table->addColumn('all_check', function ($item) {
+            return '<div class="m-checkbox-list">
+                <label class="m-checkbox">
+                    <input type="checkbox" name="item[]" value="' . $item['id'] . '" class="check_items">&nbsp;
+                    <span></span>
+                </label>';
+        });
         $table->editColumn('condition', function ($item) {
             if ($item['condition'] == 'broken') {
                 return '<span class="m-badge m-badge--danger m-badge--wide">Rusak</span>';
@@ -236,7 +244,7 @@ class ItemController extends Controller
                 return '<span class="m-badge m-badge--success m-badge--wide">Bagus</span>';
             }
         });
-        $table->rawColumns(['checkbox', 'location', 'condition']);
+        $table->rawColumns(['checkbox', 'location', 'condition', 'all_check']);
         $table->addIndexColumn();
         return $table->make(true);
     }

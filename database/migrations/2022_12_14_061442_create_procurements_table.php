@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->integer('amount');
+            $table->integer('id_source');
             $table->bigInteger('unit_price')->nullable();
             $table->bigInteger('total_price')->nullable();
             $table->date('date_of_filing')->nullable();

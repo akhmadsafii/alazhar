@@ -26,8 +26,11 @@ class ExterminateController extends Controller
         // dd($stuff);
         $location = Location::where('status', '!=', 0)->get();
         // dd($location);
-        $extermination =  Extermination::select(['exterminations.*'])->with('stuffs', 'items', 'stuffs.types')->where('status', '!=', 0);
-        // dd($extermination);
+        $extermination = Extermination::join('items', 'items.id', '=', 'exterminations.id_item')
+            ->join('stuffs', 'stuffs.id', '=', 'items.id_stuff')
+            ->join('types', 'types.id', '=', 'stuffs.id_type')
+            ->select(['exterminations.*', 'items.code as code_item', 'stuffs.name as name', 'types.group as type'])
+            ->where('exterminations.status', '!=', 0);
         if ($_GET['status'] == 'submission')
             $extermination->where('exterminations.status', '=', 2);
         if ($_GET['status'] == 'approved')
@@ -37,54 +40,32 @@ class ExterminateController extends Controller
         if ($_GET['status'] == 'all-procurement')
             $extermination->where('exterminations.status', '!=', 0);
 
-        $extermination = $extermination->get();
+        // $extermination = $extermination->get();
         // dd($extermination);
         if ($request->ajax()) {
             return DataTables::of($extermination)->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    $btn = '<div class="m-dropdown m-dropdown--inline m-dropdown--arrow m-dropdown--align-left m-dropdown--align-push" m-dropdown-toggle="click" aria-expanded="true">
-                    <a href="javascript:void(0)" class="m-portlet__nav-link m-dropdown__toggle btn m-btn m-btn--link">
-                        <i class="la la-ellipsis-v"></i>
-                    </a>
-                    <div class="m-dropdown__wrapper">
-                        <span class="m-dropdown__arrow m-dropdown__arrow--left m-dropdown__arrow--adjust"></span>
-                        <div class="m-dropdown__inner" >
-                            <div class="m-dropdown__body">
-                                <div class="m-dropdown__content">
-                                    <ul class="m-nav">
-                                        <li class="m-nav__item">
-                                            <a href="javascript:void(0)" onclick="detailData(' . $row['id'] . ')" class="m-nav__link">
-                                                <i class="m-nav__link-icon flaticon-info"></i>
-                                                <span class="m-nav__link-text">Detail</span>
-                                            </a>
-                                        </li>';
+                    $btn =  '<span class="dropdown">
+                        <a href="#" class="btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" data-toggle="dropdown" aria-expanded="true">
+                            <i class="la la-ellipsis-v"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="javascript:void(0)" onclick="detailData(' . $row['id'] . ')"><i class="la la-info-circle"></i> Detail</a>';
                     if ($row['status'] == 2) {
-                        $btn .= '<li class="m-nav__item">
-                                            <a href="javascript:void(0)" onclick="editData(' . $row['id'] . ')" class="m-nav__link">
-                                                <i class="m-nav__link-icon flaticon-edit"></i>
-                                                <span class="m-nav__link-text">Edit</span>
-                                            </a>
-                                        </li>
-                                        <li class="m-nav__item">
-                                            <a href="javascript:void(0)" onclick="deleteData(' . $row['id'] . ')" class="m-nav__link">
-                                                <i class="m-nav__link-icon flaticon-delete"></i>
-                                                <span class="m-nav__link-text">Hapus</span>
-                                            </a>
-                                        </li>';
+                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="editData(' . $row['id'] . ')"><i class="la la-edit"></i> Edit</a>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="deleteData(' . $row['id'] . ')"><i class="la la-trash"></i> Hapus</a>';
                     }
-                    $btn .= '</ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>';
+                    $btn .= '</div></span>';
                     return $btn;
                 })
                 ->addColumn('stuff', function ($exterminate) {
-                    return $exterminate->stuffs != null ? $exterminate->stuffs->name : '-';
+                    return $exterminate['name'] != null ? $exterminate['name'] : '-';
                 })
                 ->editColumn('status', function ($exterminate) {
                     return '<span class="m-badge m-badge--' . StatusHelper::exterminate($exterminate['status'])['class'] . ' m-badge--wide">' . StatusHelper::exterminate($exterminate['status'])['message'] . '</span>';
+                })
+                ->editColumn('date_extermination', function ($exterminate) {
+                    return DateHelper::getHoursMinute($exterminate['extermination_date']);
                 })
                 ->addColumn('filter', function ($exterminate) {
                     $text = 'filter sarana';
@@ -93,7 +74,7 @@ class ExterminateController extends Controller
                     }
                     return $text;
                 })
-                ->rawColumns(['action', 'stuff', 'status', 'filter'])
+                ->rawColumns(['action', 'stuff', 'status', 'date_extermination'])
                 ->make(true);
         }
         // dd($type);
