@@ -28,9 +28,9 @@ class ProcurementController extends Controller
         $sources = Source::where('status', '!=', 0)->get();
         // dd($sources);
 
-        $procurement =  Procurement::join('stuffs as st', 'st.id', '=', 'procurements.id_stuff')
-            ->join('types as tp', 'tp.id', '=', 'st.id_type')
-            ->select('procurements.*', 'st.name as name_stuff', 'tp.group as group');
+        $procurement =  Procurement::join('stuffs', 'stuffs.id', '=', 'procurements.id_stuff')
+            ->join('types', 'types.id', '=', 'stuffs.id_type')
+            ->select('procurements.*', 'stuffs.name as name_stuff', 'types.group as group');
         if ($_GET['status'] == 'submission')
             $procurement->where('procurements.status', '=', 2);
 
@@ -40,8 +40,6 @@ class ProcurementController extends Controller
             $procurement->where('procurements.status', '=', 3);
         if ($_GET['status'] == 'all-procurement')
             $procurement->where('procurements.status', '!=', 0);
-
-        $procurement = $procurement->get();
         if ($request->ajax()) {
             return DataTables::of($procurement)->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -69,6 +67,14 @@ class ProcurementController extends Controller
                     return number_format($pro['total_price'], 0, ',', '.');
                 })
                 ->editColumn('priority', function ($pro) {
+                    if ($pro['priority'] == 'urgent') {
+                        $priority = '<span class="dtr-data"><span class="m-badge m-badge--danger m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-danger">Mendesak</span></span>';
+                    } else {
+                        $priority = '<span class="dtr-data"><span class="m-badge m-badge--primary m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-primary">Normal</span></span>';
+                    }
+                    return $priority;
+                })
+                ->editColumn('status', function ($pro) {
                     if ($pro['status'] == 2) {
                         $class = 'warning';
                     } elseif ($pro['status'] == 3) {
@@ -76,21 +82,14 @@ class ProcurementController extends Controller
                     } else {
                         $class = 'success';
                     }
-                    if ($pro['priority'] == 'urgent') {
-                        $priority = '<span class="m-badge m-badge--danger m-badge--wide">Mendesak</span> / <span class="m--font-' . $class . '">' . StatusHelper::procurements($pro['status']) . '</span>';
-                    } else {
-                        $priority = '<span class="m-badge m-badge--info m-badge--wide">Normal</span> / <span class="m--font-' . $class . '">' . StatusHelper::procurements($pro['status']) . '</span>';
-                    }
-                    return $priority;
+                    return '<span class="m-badge m-badge--' . $class . ' m-badge--wide">' . StatusHelper::procurements($pro['status']) . '</span>';
                 })
-                ->addColumn('filter', function ($procurement) {
-                    $text = 'filter sarana';
-                    if ($procurement['group'] == 'prasarana') {
-                        $text = 'filter prasarana';
+                ->filter(function ($instance) use ($request) {
+                    if ($request->get('group')) {
+                        $instance->where('types.group', $request->get('group'));
                     }
-                    return $text;
                 })
-                ->rawColumns(['action', 'date_of_filing', 'date_received', 'priority', 'total_price', 'filter'])
+                ->rawColumns(['action', 'date_of_filing', 'date_received', 'priority', 'total_price', 'status'])
                 ->make(true);
         }
         // dd($type);

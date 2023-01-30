@@ -26,11 +26,11 @@ class RentalController extends Controller
         ])->get();
         $location = Location::where('status', '!=', 0)->get();
 
-        $rental =  Rental::join('stuffs as st', 'st.id', '=', 'rentals.id_stuff')
-            ->join('items as it', 'it.id', '=', 'rentals.id_item')
-            ->join('users as us', 'us.id', '=', 'rentals.id_user')
-            ->join('types as tp', 'tp.id', '=', 'st.id_type')
-            ->select('rentals.*', 'st.name as name_stuff', 'it.code as name_item', 'us.name as name_user', 'tp.group as group');
+        $rental =  Rental::join('stuffs', 'stuffs.id', '=', 'rentals.id_stuff')
+            ->join('items', 'items.id', '=', 'rentals.id_item')
+            ->join('users', 'users.id', '=', 'rentals.id_user')
+            ->join('types', 'types.id', '=', 'stuffs.id_type')
+            ->select('rentals.*', 'stuffs.name as name_stuff', 'items.code as name_item', 'users.name as name_user', 'types.group as group');
         if ($_GET['status'] == 'submission')
             $rental->where('rentals.status', '=', 2);
 
@@ -48,8 +48,6 @@ class RentalController extends Controller
             ]);
         if ($_GET['status'] == 'all-procurement')
             $rental->where('rentals.status', '!=', 0);
-
-        $rental = $rental->get();
         if ($request->ajax()) {
             return DataTables::of($rental)->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -74,14 +72,12 @@ class RentalController extends Controller
                 ->editColumn('return_date', function ($row) {
                     return DateHelper::getHoursMinute($row['return_date']);
                 })
-                ->addColumn('filter', function ($rental) {
-                    $text = 'filter sarana';
-                    if ($rental['group'] == 'prasarana') {
-                        $text = 'filter prasarana';
+                ->filter(function ($instance) use ($request) {
+                    if ($request->get('group')) {
+                        $instance->where('types.group', $request->get('group'));
                     }
-                    return $text;
                 })
-                ->rawColumns(['action', 'rental_date', 'return_date', 'filter'])
+                ->rawColumns(['action', 'rental_date', 'return_date'])
                 ->make(true);
         }
         // dd($type);

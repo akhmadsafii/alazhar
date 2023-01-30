@@ -54,8 +54,8 @@
                         </div>
                         <select name="" id="group-status" class="form-control my-2">
                             <option value="" selected disabled>-- Filter berdasarkan jenis --</option>
-                            <option value="filter sarana">Sarana</option>
-                            <option value="filter prasarana">Prasarana</option>
+                            <option value="sarana">Sarana</option>
+                            <option value="prasarana">Prasarana</option>
                         </select>
                         <div class="input-group-prepend">
                             <button class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air my-2"
@@ -79,7 +79,6 @@
                                     <th>Kategori Barang</th>
                                     <th>Jumlah</th>
                                     <th>Status</th>
-                                    <th></th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -333,7 +332,13 @@
                     processing: true,
                     serverSide: true,
                     responsive: true,
-                    ajax: "",
+                    ajax: {
+                        url: "",
+                        data: function(d) {
+                            d.group = $('#group-status').val(),
+                            d.search = $('input[type="search"]').val()
+                        }
+                    },
                     dom: "<'row'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>\n\t\t\t<'row'<'col-sm-12'tr>>\n\t\t\t<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 dataTables_pager'lp>>",
                     buttons: [
                         "print",
@@ -354,12 +359,12 @@
                             name: 'name',
                         },
                         {
-                            data: 'types.name',
-                            name: 'types.name',
+                            data: 'type',
+                            name: 'type',
                         },
                         {
-                            data: 'categories.name',
-                            name: 'categories.name',
+                            data: 'category',
+                            name: 'categoriy',
                         },
                         {
                             data: 'amount',
@@ -378,17 +383,11 @@
                             searchable: false,
                             className: 'text-center align-middle'
                         },
-                        {
-                            data: 'filter',
-                            name: 'filter',
-                            visible: false,
-                        },
                     ]
                 });
 
                 $('#group-status').on('change', function() {
-                    // console.log(this.value);
-                    table.search(this.value).draw();
+                    table.draw();
                 });
 
                 $('#formSubmit').on('submit', function(event) {

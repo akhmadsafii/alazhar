@@ -52,6 +52,9 @@
                                 case 'rejected':
                                     $title = 'Pemusnahan Ditolak';
                                     break;
+                                case 'finished':
+                                    $title = 'Peminjaman Selesai';
+                                    break;
                                 default:
                                     $title = 'Semua Pemusnahan';
                                     break;
@@ -68,14 +71,16 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-right">
                             <a class="dropdown-item" href="{{ route('exterminate.home', ['status' => 'submission']) }}"><i
-                                    class="la la-plus"></i> Pengajuan Peminjaman</a>
+                                    class="la la-plus"></i> Pengajuan Pemusnahan</a>
                             <a class="dropdown-item" href="{{ route('exterminate.home', ['status' => 'approved']) }}"><i
-                                    class="la la-check-circle"></i> Peminjaman Diterima</a>
+                                    class="la la-check-circle"></i> Pemusnahan Diterima</a>
                             <a class="dropdown-item" href="{{ route('exterminate.home', ['status' => 'rejected']) }}"><i
-                                    class="la la-close"></i> Peminjaman Ditolak</a>
+                                    class="la la-close"></i> Pemusnahan Ditolak</a>
+                            <a class="dropdown-item" href="{{ route('exterminate.home', ['status' => 'finished']) }}"><i
+                                    class="la la-align-justify"></i> Pemusnahan Selesai</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{{ route('exterminate.home', ['status' => 'all-rentals']) }}"><i
-                                    class="la la-copy"></i> Semua Peminjaman</a>
+                                    class="la la-copy"></i> Semua Pemusnahan</a>
                         </div>
                     </div>
                 </div>
@@ -103,8 +108,8 @@
                         </div>
                         <select name="" id="group-status" class="form-control my-2">
                             <option value="" selected disabled>-- Filter berdasarkan jenis --</option>
-                            <option value="filter sarana">Sarana</option>
-                            <option value="filter prasarana">Prasarana</option>
+                            <option value="sarana">Sarana</option>
+                            <option value="prasarana">Prasarana</option>
                         </select>
                     </div>
                 </div>
@@ -358,46 +363,6 @@
                 </div>
             </div>
         </div>
-        {{-- <div class="modal fade" id="modalConfirm" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <form class="m-form m-form--fit m-form--label-align-right" id="formConfirm">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <center>
-                                <h5>Konfirmasi Barang Kembali</h5>
-                                <i class="m-nav__link-icon flaticon-safe-shield-protection fa-5x text-primary"></i>
-                                <div class="form-group m-form__group row">
-                                    <input type="hidden" name="id" id="c_id_rental">
-                                    <label class="col-form-label col-lg-4 col-sm-12">Tanggal Pengembalian</label>
-                                    <div class="col-lg-8 col-sm-12">
-                                        <div class="input-group date">
-                                            <input type="text" name="returned_date" id="returned_date"
-                                                class="form-control m-input m_datetimepicker_3" readonly
-                                                placeholder="Select date & time" />
-                                            <div class="input-group-append">
-                                                <span class="input-group-text"><i
-                                                        class="la la-calendar-check-o glyphicon-th"></i></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </center>
-                        </div>
-                        <div class="modal-footer d-flex justify-content-between">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
-                            <div class="action">
-                                <button type="submit" class="btn btn-success" id="btnConfirm">Konfirmasi</a>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div> --}}
     @endpush
     @push('scripts')
         @include('package.datatable.datatable_js')
@@ -405,6 +370,7 @@
         @include('package.datetimepicker.datetimepicker_js')
         @include('component.formImageSubmit')
         <script>
+            var table;
             $(function() {
                 $.ajaxSetup({
                     headers: {
@@ -412,22 +378,16 @@
                     }
                 });
 
-
-                // $('#id_stuff').change(function() {
-                //     loadItem($(this).val(), $('#id_location').val());
-                // });
-
-
-                // $('#id_location').change(function() {
-                //     loadItem($('#id_stuff').val(), $(this).val());
-                // });
-
-
-                var table = $('.datatable').DataTable({
+                table = $('.datatable').DataTable({
                     processing: true,
                     serverSide: true,
                     responsive: true,
-                    ajax: "",
+                    ajax: {
+                        url: "",
+                        data: function(d) {
+                            d.group = $('#group-status').val()
+                        }
+                    },
                     dom: "<'row'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>\n\t\t\t<'row'<'col-sm-12'tr>>\n\t\t\t<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 dataTables_pager'lp>>",
                     buttons: [
                         "print",
@@ -478,7 +438,7 @@
                 });
 
                 $('#group-status').on('change', function() {
-                    table.search(this.value).draw();
+                    table.draw();
                 });
 
                 $("#select-all").click(function(e) {
@@ -529,7 +489,7 @@
                                 $('#btnSubmit').attr("disabled", false);
                             }
                         });
-                    }else{
+                    } else {
                         alert('anda belum memilih item yang akan dimusnahkan');
                     }
                 });
@@ -716,6 +676,24 @@
                     }
                 });
                 return false;
+            }
+
+            function confirmData(id) {
+                if (confirm("Apa kamu yakin ingin konfirmasi pemusnahan ini?") == true) {
+                    $.ajax({
+                        url: "{{ route('exterminate.confirm') }}",
+                        data: {
+                            id
+                        },
+                        success: function(data) {
+                            $('.datatable').dataTable().fnDraw(false);
+                        },
+                        error: function(data) {
+                            const res = data.responseJSON;
+                            toastr.error(res.message, "GAGAL");
+                        }
+                    })
+                }
             }
 
             function changeStatus(id, status, evt) {

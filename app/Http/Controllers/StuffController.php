@@ -32,7 +32,10 @@ class StuffController extends Controller
         $unit = Unit::where('status', '!=', 0)->get();
         $supplier = Supplier::where('status', '!=', 0)->get();
         $sources = Source::where('status', '!=', 0)->get();
-        $stuff = Stuff::select(['stuffs.*'])->where('stuffs.status', '!=', 0)->with('types', 'categories')->get();
+        $stuff = Stuff::join('types', 'types.id', '=', 'stuffs.id_type')
+            ->join('categories', 'categories.id', '=', 'stuffs.id_category')
+            ->select(['stuffs.*', 'categories.name as category', 'types.name as type', 'types.group as type'])
+            ->where('stuffs.status', '!=', 0);
         if ($request->ajax()) {
             return DataTables::of($stuff)->addIndexColumn()
                 ->addColumn('action', function ($row) {
@@ -60,17 +63,22 @@ class StuffController extends Controller
                     }
                     return $status_bhp;
                 })
-                ->addColumn('filter', function ($stuff) {
-                    $text = 'filter sarana';
-                    if ($stuff->types->group == 'prasarana') {
-                        $text = 'filter prasarana';
+                ->filter(function ($instance) use ($request) {
+                    if ($request->get('group')) {
+                        $instance->where('types.group', $request->get('group'));
                     }
-                    return $text;
+                    if (!empty($request->get('search'))) {
+                        $instance->where(function ($w) use ($request) {
+                            $search = $request->get('search');
+                            $w->orWhere('stuffs.name', 'LIKE', "%$search%")
+                                ->orWhere('types.name', 'LIKE', "%$search%")
+                                ->orWhere('categories.name', 'LIKE', "%$search%");
+                        });
+                    }
                 })
-                ->rawColumns(['action', 'status_bhp', 'filter'])
+                ->rawColumns(['action', 'status_bhp'])
                 ->make(true);
         }
-        // dd($type);
         $import = array(
             'template' => route('stuff.template'),
             'upload' => route('stuff.import')

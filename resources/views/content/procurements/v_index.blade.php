@@ -102,8 +102,8 @@
                         </div>
                         <select name="" id="group-status" class="form-control my-2">
                             <option value="" selected disabled>-- Filter berdasarkan jenis --</option>
-                            <option value="filter sarana">Sarana</option>
-                            <option value="filter prasarana">Prasarana</option>
+                            <option value="sarana">Sarana</option>
+                            <option value="prasarana">Prasarana</option>
                         </select>
                     </div>
                 </div>
@@ -115,12 +115,12 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Prioritas / Status</th>
+                                    <th>Prioritas</th>
                                     <th>Nama</th>
                                     <th>Barang</th>
                                     <th>Tanggal Pengajuan</th>
                                     <th>Nominal</th>
-                                    <th></th>
+                                    <th>Status</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -239,6 +239,7 @@
         <script src="{{ asset('asset/plugins/onlyNumber.js') }}"></script>
         <script src="{{ asset('asset/plugins/ribuan.js') }}"></script>
         <script>
+            var table;
             $(function() {
                 $.ajaxSetup({
                     headers: {
@@ -246,11 +247,16 @@
                     }
                 });
 
-                var table = $('.datatable').DataTable({
+                table = $('.datatable').DataTable({
                     processing: true,
                     serverSide: true,
                     responsive: true,
-                    ajax: "",
+                    ajax: {
+                        url: "",
+                        data: function(d) {
+                            d.group = $('#group-status').val()
+                        }
+                    },
                     dom: "<'row'<'col-sm-6 text-left'f><'col-sm-6 text-right'B>>\n\t\t\t<'row'<'col-sm-12'tr>>\n\t\t\t<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 dataTables_pager'lp>>",
                     buttons: [
                         "print",
@@ -292,23 +298,22 @@
                             className: 'align-middle text-right'
                         },
                         {
+                            data: 'status',
+                            name: 'status',
+                            className: 'align-middle'
+                        },
+                        {
                             data: 'action',
                             name: 'action',
                             orderable: false,
                             searchable: false,
                             className: 'text-center align-middle'
                         },
-                        {
-                            data: 'filter',
-                            name: 'filter',
-                            visible: false,
-                        },
                     ]
                 });
 
                 $('#group-status').on('change', function() {
-                    // console.log(this.value);
-                    table.search(this.value).draw();
+                    table.draw();
                 });
 
                 $('#formSubmit').on('submit', function(event) {

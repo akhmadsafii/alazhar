@@ -200,6 +200,7 @@ Route::middleware('auth:admin')->group(function () {
         Route::get('detail-complete', [ExterminateController::class, 'detail_complete'])->name('detail_complete');
         Route::post('update', [ExterminateController::class, 'update'])->name('update');
         Route::get('delete', [ExterminateController::class, 'delete'])->name('delete');
+        Route::get('confirm', [ExterminateController::class, 'confirm'])->name('confirm');
         Route::get('update-status', [ExterminateController::class, 'update_status'])->name('update_status');
     });
 

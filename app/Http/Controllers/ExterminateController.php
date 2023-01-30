@@ -34,23 +34,35 @@ class ExterminateController extends Controller
         if ($_GET['status'] == 'submission')
             $extermination->where('exterminations.status', '=', 2);
         if ($_GET['status'] == 'approved')
-            $extermination->where('exterminations.status', '=', 1);
+            $extermination->where([
+                ['exterminations.status', 1],
+                ['exterminations.exterminated_date', NULL]
+            ]);
         if ($_GET['status'] == 'rejected')
             $extermination->where('exterminations.status', '=', 3);
+        if ($_GET['status'] == 'finished')
+            $extermination->where([
+                ['exterminations.status', 1],
+                ['exterminations.exterminated_date', '!=', NULL]
+            ]);
         if ($_GET['status'] == 'all-procurement')
             $extermination->where('exterminations.status', '!=', 0);
 
         // $extermination = $extermination->get();
         // dd($extermination);
         if ($request->ajax()) {
+            // dd($request);
             return DataTables::of($extermination)->addIndexColumn()
                 ->addColumn('action', function ($row) {
                     $btn =  '<span class="dropdown">
                         <a href="#" class="btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" data-toggle="dropdown" aria-expanded="true">
                             <i class="la la-ellipsis-v"></i>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                        <a class="dropdown-item" href="javascript:void(0)" onclick="detailData(' . $row['id'] . ')"><i class="la la-info-circle"></i> Detail</a>';
+                        <div class="dropdown-menu dropdown-menu-right">';
+                    if ($row['status'] == 1 && $row['exterminated_date'] == NULL) {
+                        $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="confirmData(' . $row['id'] . ')"><i class="la la-check-circle"></i> Konfirmasi</a>';
+                    }
+                    $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="detailData(' . $row['id'] . ')"><i class="la la-info-circle"></i> Detail</a>';
                     if ($row['status'] == 2) {
                         $btn .= '<a class="dropdown-item" href="javascript:void(0)" onclick="editData(' . $row['id'] . ')"><i class="la la-edit"></i> Edit</a>
                                 <a class="dropdown-item" href="javascript:void(0)" onclick="deleteData(' . $row['id'] . ')"><i class="la la-trash"></i> Hapus</a>';
@@ -62,17 +74,19 @@ class ExterminateController extends Controller
                     return $exterminate['name'] != null ? $exterminate['name'] : '-';
                 })
                 ->editColumn('status', function ($exterminate) {
-                    return '<span class="m-badge m-badge--' . StatusHelper::exterminate($exterminate['status'])['class'] . ' m-badge--wide">' . StatusHelper::exterminate($exterminate['status'])['message'] . '</span>';
+                    if ($exterminate['exterminated_date'] != NULL) {
+                        return '<span class="m-badge m-badge--primary m-badge--wide">Selesai</span>';
+                    } else {
+                        return '<span class="m-badge m-badge--' . StatusHelper::exterminate($exterminate['status'])['class'] . ' m-badge--wide">' . StatusHelper::exterminate($exterminate['status'])['message'] . '</span>';
+                    }
                 })
                 ->editColumn('date_extermination', function ($exterminate) {
                     return DateHelper::getHoursMinute($exterminate['extermination_date']);
                 })
-                ->addColumn('filter', function ($exterminate) {
-                    $text = 'filter sarana';
-                    if ($exterminate->stuffs->types->group == 'prasarana') {
-                        $text = 'filter prasarana';
+                ->filter(function ($instance) use ($request) {
+                    if ($request->get('group')) {
+                        $instance->where('types.group', $request->get('group'));
                     }
-                    return $text;
                 })
                 ->rawColumns(['action', 'stuff', 'status', 'date_extermination'])
                 ->make(true);
@@ -176,8 +190,22 @@ class ExterminateController extends Controller
 
     public function delete(Request $request)
     {
-        $procurement = Extermination::find($request->id);
-        $procurement->update(array('status' => 0));
+        $extermination = Extermination::find($request->id);
+        $extermination->update(array('status' => 0));
+        return response()->json([
+            'message' => 'Pemusnahan Barang berhasil dihapus',
+            'status' => true,
+        ], 200);
+    }
+
+    public function confirm(Request $request)
+    {
+        $extermination = Extermination::find($request->id);
+        $extermination->update(array('exterminated_date' => now()));
+        $stuff = Stuff::find($extermination->id_stuff);
+        $return_amount = $stuff->amount - 1;
+        $stuff->update(['amount' => $return_amount]);
+        Item::where('id', $extermination->id_item)->update(['status' => 0]);
         return response()->json([
             'message' => 'Pemusnahan Barang berhasil dihapus',
             'status' => true,
@@ -188,12 +216,6 @@ class ExterminateController extends Controller
     {
         $exterminate = Extermination::find($request->id);
         $exterminate->update(['status' => $request->status]);
-        if ($request->status == 1) {
-            $stuff = Stuff::find($exterminate->id_stuff);
-            $return_amount = $stuff->amount - 1;
-            $stuff->update(['amount' => $return_amount]);
-            Item::where('id', $exterminate->id_item)->update(['status' => 0]);
-        }
         return response()->json([
             'message' => 'Status Peminjaman berhasil diupdate',
             'status' => true,
