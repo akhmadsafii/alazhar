@@ -140,10 +140,10 @@
                         aria-haspopup="true"><a href="{{ route('supplier.home') }}" class="m-menu__link "><i
                                 class="m-menu__link-bullet m-menu__link-bullet--dot"><span></span></i><span
                                 class="m-menu__link-text">Penyedia</span></a></li>
-                    <li class="m-menu__item {{ Route::is('broken_action.*') ? 'm-menu__item--active' : '' }}"
+                    {{-- <li class="m-menu__item {{ Route::is('broken_action.*') ? 'm-menu__item--active' : '' }}"
                         aria-haspopup="true"><a href="{{ route('broken_action.home') }}" class="m-menu__link "><i
                                 class="m-menu__link-bullet m-menu__link-bullet--dot"><span></span></i><span
-                                class="m-menu__link-text">Tindakan Pemusnahan</span></a></li>
+                                class="m-menu__link-text">Tindakan Pemusnahan</span></a></li> --}}
                     <li class="m-menu__item {{ Route::is('source.*') ? 'm-menu__item--active' : '' }}"
                         aria-haspopup="true"><a href="{{ route('source.home') }}" class="m-menu__link "><i
                                 class="m-menu__link-bullet m-menu__link-bullet--dot"><span></span></i><span

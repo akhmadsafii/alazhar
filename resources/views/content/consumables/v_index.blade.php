@@ -41,7 +41,7 @@
                 </div>
                 <div class="m-portlet__head-tools">
                     <ul class="m-portlet__nav">
-                        <li class="m-portlet__nav-item">
+                        {{-- <li class="m-portlet__nav-item">
                             <a href="#" class="btn btn-success m-btn m-btn--custom m-btn--icon m-btn--air">
                                 <span>
                                     <i class="la la-file-text-o"></i>
@@ -49,7 +49,7 @@
                                 </span>
                             </a>
                         </li>
-                        <li class="m-portlet__nav-item"></li>
+                        <li class="m-portlet__nav-item"></li> --}}
                         <li class="m-portlet__nav-item">
                             <button onclick="addData()" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air">
                                 <span>

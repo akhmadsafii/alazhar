@@ -175,8 +175,8 @@
                             className: 'align-middle'
                         },
                         {
-                            data: 'name',
-                            name: 'name',
+                            data: 'code',
+                            name: 'code',
                         },
                         {
                             data: 'condition',
