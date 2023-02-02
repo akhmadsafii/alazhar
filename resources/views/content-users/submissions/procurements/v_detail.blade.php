@@ -149,6 +149,7 @@
                         data: $(this).serialize(),
                         dataType: "json",
                         success: function(data) {
+                            toastr.success(data.message, "Berhasil");
                             $('#formSubmit').trigger("reset");
                             $('#btnSubmit').removeClass('m-loader m-loader--light m-loader--right');
                             $("#btnSubmit").attr("disabled", false);

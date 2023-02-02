@@ -198,7 +198,7 @@
                     $("input:checkbox[class=check_items]:checked").each(function() {
                         id_items.push($(this).val());
                     });
-                    console.log(id_items);
+                    // console.log(id_items);
                     if (id_items) {
                         $('#modal-title').html("Tambah {{ session('title') }}");
                         $('#modalForm').modal('show');
