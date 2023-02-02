@@ -90,7 +90,7 @@ Route::prefix('user')->name('user.')->group(function () {
 Route::middleware('auth:admin')->group(function () {
     Route::prefix('dashboard')->name('admin.')->group(function () {
         Route::get('/', [DashboardController::class, 'admin'])->name('dashboard');
-        Route::get('statistic_chart', [DashboardConftroller::class, 'statistic_chart'])->name('statistic');
+        Route::get('statistic_chart', [DashboardController::class, 'statistic_chart'])->name('statistic');
         Route::get('not-back', [DashboardController::class, 'not_back'])->name('dashboard-not_back');
         Route::get('last-procurement', [DashboardController::class, 'last_procurement'])->name('dashboard-last_procurement');
     });

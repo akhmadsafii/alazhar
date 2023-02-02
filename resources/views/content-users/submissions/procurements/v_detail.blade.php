@@ -72,7 +72,7 @@
                 <div class="m-portlet__body pt-0">
                     <div class="form-group">
                         <label>Judul Pengadaan</label>
-                        <input type="text" name="name" id="name" class="form-control">
+                        <input type="text" name="name" required id="name" class="form-control">
                         <input type="hidden" name="id_stuff" id="id_stuff" value="{{ $stuff['id'] }}">
                     </div>
                     <div class="row">
