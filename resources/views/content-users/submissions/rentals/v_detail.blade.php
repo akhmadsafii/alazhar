@@ -162,10 +162,6 @@
                     processing: true,
                     serverSide: true,
                     responsive: true,
-                    paging: false,
-                    length: false,
-                    ordering: false,
-                    info: false,
                     ajax: "",
                     columns: [{
                             data: 'checkbox',

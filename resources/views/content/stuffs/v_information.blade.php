@@ -86,6 +86,14 @@
                 </div>
                 <div class="m-portlet__head-tools">
                     <ul class="m-portlet__nav">
+                        <li class="m-portlet__nav-item d-none" id="display-location">
+                            <button onclick="addLocation()" class="btn btn-info m-btn m-btn--custom m-btn--icon m-btn--air">
+                                <span>
+                                    <i class="la la-location-arrow"></i>
+                                    <span>Set Lokasi</span>
+                                </span>
+                            </button>
+                        </li>
                         <li class="m-portlet__nav-item">
                             <button onclick="addData()" class="btn btn-primary m-btn m-btn--custom m-btn--icon m-btn--air">
                                 <span>
@@ -103,7 +111,15 @@
                         <table class="table table-striped- table-bordered table-hover table-checkable datatable">
                             <thead>
                                 <tr>
-                                    <th>#</th>
+                                    <th>
+                                        <div class="m-checkbox-list">
+                                            <label class="m-checkbox">
+                                                <input type="checkbox" id="select-all" name="item[]"
+                                                    class="check_items">&nbsp;
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </th>
                                     <th>Kode</th>
                                     <th>Lokasi</th>
                                     <th>Kondisi</th>
@@ -144,7 +160,8 @@
                             <div class="form-group">
                                 <div class="form-group" id="display-amount">
                                     <label>Jumlah Barang</label>
-                                    <input type="text" name="amount" id="amount" onkeypress="return onlyNumber(event)" class="form-control">
+                                    <input type="text" name="amount" id="amount"
+                                        onkeypress="return onlyNumber(event)" class="form-control">
                                 </div>
                             </div>
                             <div class="row display-stuff">
@@ -182,72 +199,103 @@
                 </div>
             </div>
         </div>
-
-        <div class="modal fade" id="modalDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <form class="m-form m-form--fit m-form--label-align-right" id="formSubmit">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modal-title-detail"></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group m-form__group row pb-0">
-                                    <label class="col-lg-4 col-form-label">Kode:</label>
-                                    <div class="col-lg-8">
-                                        <p class="alert m-alert mb-0" id="output_code">email@example.com</p>
-                                    </div>
-                                </div>
-                                <div class="form-group m-form__group row py-0">
-                                    <label class="col-lg-4 col-form-label">Lokasi:</label>
-                                    <div class="col-lg-8">
-                                        <p class="alert m-alert mb-0" id="output_location">email@example.com</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group m-form__group row pb-0">
-                                    <label class="col-lg-4 col-form-label">Kategori:</label>
-                                    <div class="col-lg-8">
-                                        <p class="alert m-alert mb-0" id="output_category">email@example.com</p>
-                                    </div>
-                                </div>
-                                <div class="form-group m-form__group row py-0">
-                                    <label class="col-lg-4 col-form-label">Jenis:</label>
-                                    <div class="col-lg-8">
-                                        <p class="alert m-alert mb-0" id="output_type">email@example.com</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <table class="table table-striped- table-bordered table-hover table-checkable item-table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Penyewa</th>
-                                            <th>Role</th>
-                                            <th>Tanggal Sewa</th>
-                                            <th>Tanggal Kembali</th>
-                                            <th>Keterangan</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                </table>
+        <div class="modal fade" id="modalLocation" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <form class="m-form m-form--fit m-form--label-align-right" id="formSubmitLocation">
+                        <div class="modal-header">
+                            <h5 class="modal-title"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Lokasi</label>
+                                <select name="id_location" id="l_id_location"
+                                    class="form-control m-bootstrap-select m_selectpicker" data-live-search="true">
+                                    <option value="" selected disabled>-- Pilih Lokasi --</option>
+                                    @foreach ($locations as $loc)
+                                        <option value="{{ $loc['id'] }}">{{ $loc['name'] }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Tutup</button>
-                    </div>
-                </form>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Keluar</button>
+                            <button type="submit" class="btn btn-primary" id="btnSubmitLocation">Simpan</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+
+        <div class="modal fade" id="modalDetail" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <form class="m-form m-form--fit m-form--label-align-right" id="formSubmit">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal-title-detail"></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group m-form__group row pb-0">
+                                        <label class="col-lg-4 col-form-label">Kode:</label>
+                                        <div class="col-lg-8">
+                                            <p class="alert m-alert mb-0" id="output_code">email@example.com</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-form__group row py-0">
+                                        <label class="col-lg-4 col-form-label">Lokasi:</label>
+                                        <div class="col-lg-8">
+                                            <p class="alert m-alert mb-0" id="output_location">email@example.com</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group m-form__group row pb-0">
+                                        <label class="col-lg-4 col-form-label">Kategori:</label>
+                                        <div class="col-lg-8">
+                                            <p class="alert m-alert mb-0" id="output_category">email@example.com</p>
+                                        </div>
+                                    </div>
+                                    <div class="form-group m-form__group row py-0">
+                                        <label class="col-lg-4 col-form-label">Jenis:</label>
+                                        <div class="col-lg-8">
+                                            <p class="alert m-alert mb-0" id="output_type">email@example.com</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <table class="table table-striped- table-bordered table-hover table-checkable item-table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Penyewa</th>
+                                                <th>Role</th>
+                                                <th>Tanggal Sewa</th>
+                                                <th>Tanggal Kembali</th>
+                                                <th>Keterangan</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Tutup</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     @endpush
     @push('scripts')
         @include('package.datatable.datatable_js')
@@ -259,6 +307,17 @@
                 $.ajaxSetup({
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                $("#select-all").click(function(e) {
+                    var table = $(e.target).closest('table');
+                    $('td input:checkbox', table).prop('checked', this.checked);
+                    var check_box = $('input[name="items[]"]:checked').length > 0;
+                    if (check_box) {
+                        $('#display-location').removeClass('d-none');
+                    } else {
+                        $('#display-location').addClass('d-none');
                     }
                 });
 
@@ -276,8 +335,8 @@
                         "pdfHtml5",
                     ],
                     columns: [{
-                            data: 'DT_RowIndex',
-                            name: 'DT_RowIndex',
+                            data: 'checkbox',
+                            name: 'checkbox',
                             orderable: false,
                             searchable: false,
                             className: 'align-middle'
@@ -302,6 +361,23 @@
                             className: 'text-center align-middle'
                         },
                     ]
+                });
+
+                $(document).on('change', '.check_item', function() {
+                    var check_box = $('input[name="items[]"]:checked').length > 0;
+                    if (check_box) {
+                        $('#display-location').removeClass('d-none');
+                    } else {
+                        $('#display-location').addClass('d-none');
+                    }
+
+                    var checkboxes = $(this).parent().find('.check_item');
+                    var checkedboxes = checkboxes.filter(':checked');
+                    if (checkboxes.length === checkedboxes.length) {
+                        $(this).parent().find('#select-all').prop('checked', true);
+                    } else {
+                        $(this).parent().find('#select-all').prop('checked', false);
+                    }
                 });
 
                 $('#formSubmit').on('submit', function(event) {
@@ -329,6 +405,43 @@
                         }
                     });
                 });
+
+                $('body').on('submit', '#formSubmitLocation', function(e) {
+                    e.preventDefault();
+                    $('#btnSubmitLocation').addClass('m-loader m-loader--light m-loader--right');
+                    $('#btnSubmitLocation').attr("disabled", true);
+                    var items = [];
+                    $("input:checkbox[class=check_item]:checked").each(function() {
+                        items.push($(this).val());
+                    });
+                    var dataPost = "id_item=" + JSON.stringify(items) + "&id_location=" + $(
+                        '#l_id_location').val();
+                    if (items.length > 0) {
+                        $.ajax({
+                            url: '{{ route('item.set_location') }}',
+                            type: "POST",
+                            data: dataPost,
+                            success: function(data) {
+                                $('#formSubmitLocation').trigger("reset");
+                                $('#modalLocation').modal('hide');
+                                $('.datatable').dataTable().fnDraw(false);
+                                toastr.success(data.message, "Berhasil");
+                                $("#select-all").prop('checked', false); 
+                                $('#display-location').addClass('d-none');
+                                $('#btnSubmitLocation').removeClass(
+                                    'm-loader m-loader--light m-loader--right');
+                                $('#btnSubmitLocation').attr("disabled", false);
+                            },
+                            error: function(data) {
+                                const res = data.responseJSON;
+                                toastr.error(res.message, "GAGAL");
+                                $('#btnSubmitLocation').removeClass(
+                                    'm-loader m-loader--light m-loader--right');
+                                $('#btnSubmitLocation').attr("disabled", false);
+                            }
+                        });
+                    }
+                });
             });
 
             function addData() {
@@ -338,6 +451,12 @@
                 $('#display-amount').removeClass('d-none');
                 $('#modal-title').html("Tambah {{ session('title') }}");
                 $('#modalForm').modal('show');
+            }
+
+            function addLocation() {
+                $('#formSubmitLocation').trigger("reset");
+                $('.modal-title').html("Lokasi {{ session('title') }}");
+                $('#modalLocation').modal('show');
             }
 
             function editData(id) {

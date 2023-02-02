@@ -160,8 +160,8 @@
 
                             <div class="form-group">
                                 <label>Barang</label>
-                                <select name="id_stuff" id="id_stuff" required class="form-control m-bootstrap-select m_selectpicker"
-                                    data-live-search="true">
+                                <select name="id_stuff" id="id_stuff" required
+                                    class="form-control m-bootstrap-select m_selectpicker" data-live-search="true">
                                     <option value="">-- Pilih Barang --</option>
                                     @foreach ($stuff as $stf)
                                         <option value="{{ $stf['id'] }}">{{ $stf['name'] }}</option>
@@ -180,8 +180,8 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label>Jumlah Barang</label>
-                                        <input type="text" required class="form-control" onkeypress="return onlyNumber(event)"
-                                            name="amount" id="amount">
+                                        <input type="text" required class="form-control"
+                                            onkeypress="return onlyNumber(event)" name="amount" id="amount">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -415,14 +415,44 @@
                             </div>
                         </div>`;
                         if (procurement.status == 2) {
-                            detail += `<div class="modal-footer d-flex justify-content-between">
+                            detail += ` 
+                            <div class="modal-footer d-flex justify-content-between">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">kembali</button>
                             <div class="btnAction">
                                 <a href="javascript:void(0)" class="btn btn-danger" onclick="updateStatus(${procurement.id}, 3, this)">Tolak</a>
-                                <button type="submit" class="btn btn-success"  onclick="updateStatus(${procurement.id}, 1, this)">Terima</button>
+                                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                                                Terima
+                                            </button>
                             </div>
                         </div>`;
                         }
+                        detail +=
+                            `</div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="collapse my-2" id="collapseExample">
+                                <div class="card card-body">
+                                    <form id="formStatus">
+                                        <div class="form-group m-form__group">
+                                            <label for="exampleSelect1">Sumber Dana</label>
+                                            <select class="form-control m-input m-input--square" id="id_sources" name="id_source">`;
+                        if (procurement.source.length > 0) {
+                            procurement.source.forEach(function(item) {
+                                detail += `<option value="${item.id}">${item.code}</option>`;
+                            });
+                        } else {
+                            detail += `<option>-- Pilih Sumber Dana --</option>`;
+                        }
+                        detail += `</select>
+                                        </div>
+                                        <div class="m-form__actions">
+                                            <button type="button" onclick="updateStatus(${procurement.id}, 1, this)" class="btn btn-primary">Lanjutkan</button>
+                                            <button type="reset" class="btn btn-secondary">Cancel</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>`;
                         $('#display-detail').html(detail);
                         $('#modalDetail').modal('show');
                     }
@@ -480,7 +510,8 @@
                     url: "{{ route('procurement.update_status') }}",
                     data: {
                         id,
-                        status
+                        status,
+                        id_source: $('#id_sources').val()
                     },
                     success: function(data) {
                         $('#modalDetail').modal('hide');

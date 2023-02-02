@@ -127,6 +127,7 @@ class ProcurementController extends Controller
         $procurement['format_date_received'] = DateHelper::getTanggal($procurement['date_received']);
         $procurement['code_handle'] = $procurement['code'] ?? '-';
         $procurement['code_status'] = StatusHelper::procurements($procurement['status']);
+        $procurement['source'] = Source::where('status', '!=', 0)->get();
         return response()->json($procurement);
     }
 
@@ -142,11 +143,19 @@ class ProcurementController extends Controller
 
     public function update_status(Request $request)
     {
+        // dd($request);
         $procurement = Procurement::find($request->id);
         $procurement->update([
-            'status' => $request->status
+            'status' => $request->status,
+            'id_source' => $request->id_source,
         ]);
         if ($request->status == 1) {
+            if (!$request->id_source) {
+                return response()->json([
+                    'message' => 'Harap masukan Sumber Dana',
+                    'status' => false,
+                ], 302);
+            }
             $stuff = Stuff::find($procurement->id_stuff);
             if ($stuff->status_bhp != 1) {
                 $source = Source::find($procurement->id_source);

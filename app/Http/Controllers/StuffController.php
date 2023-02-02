@@ -203,13 +203,22 @@ class StuffController extends Controller
                     </div>
                 </span>';
                 })
+                ->addColumn('checkbox', function ($item) {
+                    $btn = '<div class="m-checkbox-list">
+                    <label class="m-checkbox">
+                        <input type="checkbox" name="items[]" value="' . $item['id'] . '" class="check_item">&nbsp;
+                        <span></span>
+                    </label>
+                </div>';
+                    return $btn;
+                })
                 ->editColumn('condition', function ($item) {
                     return (($item->condition == 'good') ? "Baik" : "Rusak");
                 })
                 ->addColumn('location', function ($item) {
                     return $item->locations != null ? $item->locations->name : "Lokasi belum diset";
                 })
-                ->rawColumns(['action', 'location'])
+                ->rawColumns(['action', 'location', 'checkbox'])
                 ->make(true);
         }
         return view('content.stuffs.v_information', compact('stuff', 'locations', 'sources'));

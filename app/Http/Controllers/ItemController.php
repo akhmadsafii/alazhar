@@ -249,6 +249,17 @@ class ItemController extends Controller
         return $table->make(true);
     }
 
+    public function set_location(Request $request)
+    {
+        // dd($request);
+        $id_item = json_decode($request['id_item']);
+        Item::whereIn('id', $id_item)->update(['id_location' => $request->id_location]);
+        return response()->json([
+            'message' => 'Lokasi Item berhasil dirubah',
+            'status' => true,
+        ], 200);
+    }
+
     public function template()
     {
         return Excel::download(new ItemExample, '' . Carbon::now()->timestamp . '_template_item_import.xls');

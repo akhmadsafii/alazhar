@@ -181,6 +181,7 @@ Route::middleware('auth:admin')->group(function () {
         Route::get('location-item', [ItemController::class, 'location_item'])->name('location_item');
         Route::get('location-stuff', [ItemController::class, 'location_stuff'])->name('datatable_location_stuff');
         Route::get('print-qr', [ItemController::class, 'print_qr'])->name('print_qr');
+        Route::post('set-location', [ItemController::class, 'set_location'])->name('set_location');
         Route::get('template', [ItemController::class, 'template'])->name('template');
         Route::post('import', [ItemController::class, 'import'])->name('import');
     });
