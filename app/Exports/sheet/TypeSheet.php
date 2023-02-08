@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exports;
+namespace App\Exports\sheet;
 
 use App\Models\Type;
 use Illuminate\Contracts\View\View;
@@ -16,7 +16,7 @@ class TypeSheet implements FromView, WithStyles, ShouldAutoSize, WithColumnWidth
     public function columnWidths(): array
     {
         return [
-            'A' => 20,
+            'A' => 30,
             'B' => 30,
             'C' => 20,
         ];
@@ -24,7 +24,7 @@ class TypeSheet implements FromView, WithStyles, ShouldAutoSize, WithColumnWidth
 
     public function view(): View
     {
-        $type = Type::where('status','!=',0)->get();
+        $type = Type::where('status', '!=', 0)->get();
 
         return view('export.sheet.v_type_sheet', compact('type'));
     }

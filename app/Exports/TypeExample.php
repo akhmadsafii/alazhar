@@ -19,9 +19,8 @@ class TypeExample implements FromView, ShouldAutoSize, WithStyles, WithColumnWid
     public function columnWidths(): array
     {
         return [
-            'A' => 30,
-            'B' => 50,
-            'C' => 30,
+            'A' => 50,
+            'B' => 30,
         ];
     }
 
@@ -33,12 +32,12 @@ class TypeExample implements FromView, ShouldAutoSize, WithStyles, WithColumnWid
         $sheet->mergeCells('A4:K4')->setCellValue('A4', "2. Isi pada tabel yang sudah disediakan.");
         $sheet->mergeCells('A5:K5')->setCellValue('A5', "3. Isi kolom tipe dengan sarana / prasarana.");
         $sheet->mergeCells('A6:K6');
-        $sheet->getStyle('A7:C7')->getFont()->setBold(true);
+        $sheet->getStyle('A7:B7')->getFont()->setBold(true);
 
         $sheet->getStyle('A5')->getFont()->setBold(true)->getColor()->setARGB('80ff0000');
 
         // style cells
-        $sheet->getStyle('A7:C50')->applyFromArray([
+        $sheet->getStyle('A7:B50')->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,

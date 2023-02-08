@@ -2,6 +2,8 @@
 
 namespace App\Exports;
 
+use App\Exports\sheet\CategorySheet;
+use App\Exports\sheet\TypeSheet;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 

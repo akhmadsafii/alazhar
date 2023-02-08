@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Helpers\GeneralHelper;
 use App\Models\Type;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\Importable;
@@ -20,8 +21,18 @@ class TypeImport implements ToModel, WithHeadingRow,  WithValidation, WithStartR
 
     public function model(array $row)
     {
+        $code_type = GeneralHelper::codeInitial($row['name']);
+        $type = Type::where('code', 'like', "$code_type%")->orderBy('id', 'asc')->get()->last();
+        if ($type == null) {
+            $final_code = $code_type . ".1";
+        } else {
+            $code = explode('.', $type->code);
+            $getnumber = end($code);
+            $start = $getnumber + 1;
+            $final_code = $code_type . "." . $start;
+        }
         Type::create([
-            'code' => empty($row['code']) ? null : $row['code'],
+            'code' => $final_code,
             'name' => $row['name'],
             'group' => $row['group'],
             'status' => 1

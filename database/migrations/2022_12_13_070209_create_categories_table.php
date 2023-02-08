@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('code')->nullable();
             $table->integer('id_type');
             $table->string('name');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->tinyInteger('status')->default(1);
             $table->timestamps();
         });

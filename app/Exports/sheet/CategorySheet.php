@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Exports;
+namespace App\Exports\sheet;
 
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
@@ -32,17 +32,16 @@ class CategorySheet implements FromView, ShouldAutoSize, WithStyles, WithColumnW
         // merge cells
         $sheet->mergeCells('A2:k2');
         $sheet->mergeCells('A3:k3')->setCellValue('A3', "1. Semua cell diwajibkan menggunakan format text");
-        $sheet->mergeCells('A4:k4')->setCellValue('A4', "2. Isi ID Jenis sesuai pada Sheet Jenis Barang.");
-        $sheet->mergeCells('A5:k5')->setCellValue('A5', "3. Isi Nama Jenis  agar tidak bingung beserta ID-nya.");
-        $sheet->mergeCells('A6:k6')->setCellValue('A6', "4. Isi pada tabel yang sudah disediakan.");
-        $sheet->mergeCells('A7:k7');
+        $sheet->mergeCells('A4:k4')->setCellValue('A4', "2. Isi Kode Jenis sesuai pada Sheet Jenis Barang.");
+        $sheet->mergeCells('A5:k5')->setCellValue('A5', "3. Isi pada tabel yang sudah disediakan.");
+        $sheet->mergeCells('A6:k7');
         $sheet->getStyle('A8:D8')->getFont()->setBold(true);
 
         $sheet->getStyle('A4')->getFont()->setBold(true)->getColor()->setARGB('80ff0000');
         // $sheet->getStyle('C8')->getFont()->setBold(true)->getColor()->setARGB('80ff0000');
 
         // style cells
-        $sheet->getStyle('A8:E60')->applyFromArray([
+        $sheet->getStyle('A8:C60')->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
@@ -52,9 +51,9 @@ class CategorySheet implements FromView, ShouldAutoSize, WithStyles, WithColumnW
         ]);
 
         $sheet->getRowDimension(1)->setVisible(false);
-        $sheet->getStyle('A7:K7')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        $sheet->getStyle('A6:K7')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('80ff0000');
-        $sheet->getStyle('A2:K6')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+        $sheet->getStyle('A2:K5')->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFFFF00');
     }
 }

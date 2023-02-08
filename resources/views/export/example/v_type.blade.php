@@ -9,7 +9,6 @@
     <div class="table-responsive">
         <table class="table table-bordered border-primary">
             <thead class="thead-dark">
-                <td style="text-align: center; font-size:10px">code</td>
                 <td style="text-align: center; font-size:10px">name</td>
                 <td style="text-align: center; font-size:10px">group</td>
             </thead>
@@ -25,7 +24,6 @@
     <div class="table-responsive">
         <table class="table table-bordered border-primary">
             <thead class="thead-dark">
-                <td style="text-align: center; background-color:#7dd8ff; font-size:10px">Kode</td>
                 <td style="text-align: center; background-color:#7dd8ff; font-size:10px; color:red">Nama *</td>
                 <td style="text-align: center; background-color:#7dd8ff; font-size:10px; color:red">Tipe *</td>
             </thead>
